@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -238,6 +239,19 @@ func (p *Path) ReadFile() ([]byte, error) {
 // it before writing.
 func (p *Path) WriteFile(data []byte) error {
 	return ioutil.WriteFile(p.path, data, os.FileMode(0644))
+}
+
+// ReadFileAsLines reads the file named by filename and returns it as an
+// array of lines. This function takes care of the newline encoding
+// differences between different OS
+func (p *Path) ReadFileAsLines() ([]string, error) {
+	data, err := p.ReadFile()
+	if err != nil {
+		return nil, err
+	}
+	txt := string(data)
+	txt = strings.Replace(txt, "\r\n", "\n", -1)
+	return strings.Split(txt, "\n"), nil
 }
 
 func (p *Path) String() string {
