@@ -137,6 +137,13 @@ func (p *Path) Remove() error {
 	return os.Remove(p.path)
 }
 
+// RemoveAll removes path and any children it contains. It removes
+// everything it can but returns the first error it encounters. If
+// the path does not exist, RemoveAll returns nil (no error).
+func (p *Path) RemoveAll() error {
+	return os.RemoveAll(p.path)
+}
+
 // FollowSymLink transforms the current path to the path pointed by the
 // symlink if path is a symlink, otherwise it does nothing
 func (p *Path) FollowSymLink() error {
