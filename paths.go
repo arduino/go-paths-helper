@@ -75,6 +75,11 @@ func (p *Path) Base() string {
 	return filepath.Base(p.path)
 }
 
+// Ext returns the file name extension used by path
+func (p *Path) Ext() string {
+	return filepath.Ext(p.path)
+}
+
 // RelTo returns a relative Path that is lexically equivalent to r when
 // joined to the current Path
 func (p *Path) RelTo(r *Path) (*Path, error) {
