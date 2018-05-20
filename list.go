@@ -73,3 +73,15 @@ func (p *PathList) AddAll(paths PathList) {
 		*p = append(*p, path)
 	}
 }
+
+// ToAbs calls Path.ToAbs() method on each path of the list.
+// It stops at the first error and returns it. If all ToAbs calls
+// are successful nil is returned.
+func (p *PathList) ToAbs() error {
+	for _, path := range *p {
+		if err := path.ToAbs(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
