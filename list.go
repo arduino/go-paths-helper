@@ -85,3 +85,25 @@ func (p *PathList) ToAbs() error {
 	}
 	return nil
 }
+
+// Contains check if the list contains a path that match
+// exactly (EqualsTo) to the specified path
+func (p *PathList) Contains(path *Path) bool {
+	for _, path := range *p {
+		if path.EqualsTo(path) {
+			return true
+		}
+	}
+	return false
+}
+
+// ContainsEquivalentTo check if the list contains a path
+// that is equivalent (EquivalentTo) to the specified path
+func (p *PathList) ContainsEquivalentTo(path *Path) bool {
+	for _, path := range *p {
+		if path.EquivalentTo(path) {
+			return true
+		}
+	}
+	return false
+}
