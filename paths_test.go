@@ -30,10 +30,25 @@
 package paths
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
+
+func TestPathNew(t *testing.T) {
+	test1 := New("path")
+	require.Equal(t, "path", test1.String())
+
+	test2 := New("path", "path")
+	require.Equal(t, filepath.Join("path", "path"), test2.String())
+
+	test3 := New()
+	require.Nil(t, test3)
+
+	test4 := New("")
+	require.Nil(t, test4)
+}
 
 func TestPath(t *testing.T) {
 	testPath := New("_testdata")

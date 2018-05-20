@@ -56,7 +56,7 @@ func New(path ...string) *Path {
 	}
 	res := &Path{path: path[0]}
 	if len(path) > 1 {
-		res.Join(path[1:]...)
+		return res.Join(path[1:]...)
 	}
 	return res
 }
