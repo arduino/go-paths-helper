@@ -47,11 +47,18 @@ type Path struct {
 
 // New creates a new Path object. If path is the empty string
 // then nil is returned.
-func New(path string) *Path {
-	if path == "" {
+func New(path ...string) *Path {
+	if len(path) == 0 {
 		return nil
 	}
-	return &Path{path: path}
+	if len(path) == 1 && path[0] == "" {
+		return nil
+	}
+	res := &Path{path: path[0]}
+	if len(path) > 1 {
+		res.Join(path[1:]...)
+	}
+	return res
 }
 
 func (p *Path) setCachedFileInfo(info os.FileInfo) {
