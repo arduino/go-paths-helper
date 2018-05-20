@@ -74,6 +74,23 @@ func (p *PathList) AddAll(paths PathList) {
 	}
 }
 
+// AddIfMissing adds a Path to the PathList if the path is not already
+// in the list
+func (p *PathList) AddIfMissing(path *Path) {
+	if (*p).Contains(path) {
+		return
+	}
+	(*p).Add(path)
+}
+
+// AddAllMissing adds all paths to the PathList excluding the path already
+// in the list
+func (p *PathList) AddAllMissing(paths PathList) {
+	for _, path := range *p {
+		(*p).AddIfMissing(path)
+	}
+}
+
 // ToAbs calls Path.ToAbs() method on each path of the list.
 // It stops at the first error and returns it. If all ToAbs calls
 // are successful nil is returned.
