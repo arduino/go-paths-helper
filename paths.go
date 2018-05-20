@@ -302,6 +302,12 @@ func (p *Path) ReadFileAsLines() ([]string, error) {
 	return strings.Split(txt, "\n"), nil
 }
 
+// Truncate create an empty file named by path or if the file already
+// exist it trucates it (delete all contents)
+func (p *Path) Truncate() error {
+	return p.WriteFile([]byte{})
+}
+
 // EqualsTo return true if both paths are equal
 func (p *Path) EqualsTo(other *Path) bool {
 	return p.path == other.path
