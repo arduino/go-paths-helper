@@ -254,6 +254,17 @@ func (p *Path) ReadFileAsLines() ([]string, error) {
 	return strings.Split(txt, "\n"), nil
 }
 
+// EqualsTo return true if both paths are equal
+func (p *Path) EqualsTo(other *Path) bool {
+	return p.path == other.path
+}
+
+// EquivalentTo return true if both paths are equivalent (they points to the
+// same file even if they are lexicographically different)
+func (p *Path) EquivalentTo(other *Path) bool {
+	return p.Clean().path == other.Clean().path
+}
+
 func (p *Path) String() string {
 	return p.path
 }
