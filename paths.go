@@ -70,7 +70,7 @@ func (p *Path) JoinPath(paths ...*Path) *Path {
 	return res
 }
 
-// Base Base returns the last element of path
+// Base returns the last element of path
 func (p *Path) Base() string {
 	return filepath.Base(p.path)
 }
