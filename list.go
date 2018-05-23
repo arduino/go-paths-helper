@@ -112,11 +112,11 @@ func (p *PathList) AddIfMissing(path *Path) {
 	(*p).Add(path)
 }
 
-// AddAllMissing adds all paths to the PathList excluding the path already
+// AddAllMissing adds all paths to the PathList excluding the paths already
 // in the list
-func (p *PathList) AddAllMissing(paths PathList) {
-	for _, path := range *p {
-		(*p).AddIfMissing(path)
+func (p *PathList) AddAllMissing(pathsToAdd PathList) {
+	for _, pathToAdd := range pathsToAdd {
+		(*p).AddIfMissing(pathToAdd)
 	}
 }
 
