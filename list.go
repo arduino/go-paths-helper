@@ -134,9 +134,9 @@ func (p *PathList) ToAbs() error {
 
 // Contains check if the list contains a path that match
 // exactly (EqualsTo) to the specified path
-func (p *PathList) Contains(path *Path) bool {
+func (p *PathList) Contains(pathToSearch *Path) bool {
 	for _, path := range *p {
-		if path.EqualsTo(path) {
+		if path.EqualsTo(pathToSearch) {
 			return true
 		}
 	}
@@ -145,9 +145,9 @@ func (p *PathList) Contains(path *Path) bool {
 
 // ContainsEquivalentTo check if the list contains a path
 // that is equivalent (EquivalentTo) to the specified path
-func (p *PathList) ContainsEquivalentTo(path *Path) bool {
+func (p *PathList) ContainsEquivalentTo(pathToSearch *Path) bool {
 	for _, path := range *p {
-		if path.EquivalentTo(path) {
+		if path.EquivalentTo(pathToSearch) {
 			return true
 		}
 	}
