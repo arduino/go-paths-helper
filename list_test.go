@@ -30,6 +30,7 @@
 package paths
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -41,13 +42,11 @@ func TestListConstructors(t *testing.T) {
 
 	list1 := NewPathList("test")
 	require.Len(t, list1, 1)
-	require.Equal(t, "test", list1[0].String())
+	require.Equal(t, "[test]", fmt.Sprintf("%s", list1))
 
 	list3 := NewPathList("a", "b", "c")
 	require.Len(t, list3, 3)
-	require.Equal(t, "a", list3[0].String())
-	require.Equal(t, "b", list3[1].String())
-	require.Equal(t, "c", list3[2].String())
+	require.Equal(t, "[a b c]", fmt.Sprintf("%s", list3))
 
 	require.False(t, list3.Contains(New("d")))
 	require.True(t, list3.Contains(New("a")))
