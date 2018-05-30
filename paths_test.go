@@ -44,10 +44,10 @@ func TestPathNew(t *testing.T) {
 	require.Equal(t, filepath.Join("path", "path"), test2.String())
 
 	test3 := New()
-	require.Nil(t, test3)
+	require.Equal(t, "", test3.String())
 
 	test4 := New("")
-	require.Nil(t, test4)
+	require.Equal(t, "", test4.String())
 }
 
 func TestPath(t *testing.T) {
