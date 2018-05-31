@@ -153,6 +153,16 @@ func (p *Path) Clean() *Path {
 	return New(filepath.Clean(p.path))
 }
 
+// IsInsideDir returns true if the current path is inside the provided
+// dir
+func (p *Path) IsInsideDir(dir *Path) (bool, error) {
+	rel, err := filepath.Rel(p.path, dir.path)
+	if err != nil {
+		return false, err
+	}
+	return strings.Contains(rel, "../") || rel == "..", nil
+}
+
 // Parent returns all but the last element of path, typically the path's
 // directory or the parent directory if the path is already a directory
 func (p *Path) Parent() *Path {

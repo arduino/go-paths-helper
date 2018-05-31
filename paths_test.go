@@ -129,3 +129,43 @@ func TestResetStatCacheWhenFollowingSymlink(t *testing.T) {
 		}
 	}
 }
+
+func TestIsInsideDir(t *testing.T) {
+	inside := func(a, b *Path) {
+		in, err := a.IsInsideDir(b)
+		require.NoError(t, err)
+		require.True(t, in)
+	}
+
+	notInside := func(a, b *Path) {
+		in, err := a.IsInsideDir(b)
+		require.NoError(t, err)
+		require.False(t, in)
+	}
+
+	f1 := New("/a/b/c")
+	f2 := New("/a/b/c/d")
+	f3 := New("/a/b/c/d/e")
+
+	notInside(f1, f1)
+	notInside(f1, f2)
+	inside(f2, f1)
+	notInside(f1, f3)
+	inside(f3, f1)
+
+	r1 := New("a/b/c")
+	r2 := New("a/b/c/d")
+	r3 := New("a/b/c/d/e")
+	r4 := New("f/../a/b/c/d/e")
+	r5 := New("a/b/c/d/e/f/..")
+
+	notInside(r1, r1)
+	notInside(r1, r2)
+	inside(r2, r1)
+	notInside(r1, r3)
+	inside(r3, r1)
+	inside(r4, r1)
+	notInside(r1, r4)
+	inside(r5, r1)
+	notInside(r1, r5)
+}
