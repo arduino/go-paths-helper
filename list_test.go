@@ -65,3 +65,22 @@ func TestListConstructors(t *testing.T) {
 	list4.AddAllMissing(NewPathList("a", "e", "i", "o", "u"))
 	require.Equal(t, "[a b c d e i o u]", fmt.Sprintf("%s", list4))
 }
+
+func TestListSorting(t *testing.T) {
+	list := NewPathList(
+		"pointless",
+		"spare",
+		"carve",
+		"unwieldy",
+		"empty",
+		"bow",
+		"tub",
+		"grease",
+		"error",
+		"energetic",
+		"depend",
+		"property")
+	require.Equal(t, "[pointless spare carve unwieldy empty bow tub grease error energetic depend property]", fmt.Sprintf("%s", list))
+	list.Sort()
+	require.Equal(t, "[bow carve depend empty energetic error grease pointless property spare tub unwieldy]", fmt.Sprintf("%s", list))
+}

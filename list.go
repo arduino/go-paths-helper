@@ -30,6 +30,7 @@
 package paths
 
 import (
+	"sort"
 	"strings"
 )
 
@@ -152,4 +153,21 @@ func (p *PathList) ContainsEquivalentTo(pathToSearch *Path) bool {
 		}
 	}
 	return false
+}
+
+// Sort sorts this pathlist
+func (p *PathList) Sort() {
+	sort.Sort(p)
+}
+
+func (p *PathList) Len() int {
+	return len(*p)
+}
+
+func (p *PathList) Less(i, j int) bool {
+	return (*p)[i].path < (*p)[j].path
+}
+
+func (p *PathList) Swap(i, j int) {
+	(*p)[i], (*p)[j] = (*p)[j], (*p)[i]
 }
