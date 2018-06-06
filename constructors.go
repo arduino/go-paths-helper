@@ -59,3 +59,13 @@ func MkTempDir(dir, prefix string) (*Path, error) {
 	}
 	return New(path), nil
 }
+
+// Getwd returns a rooted path name corresponding to the current
+// directory.
+func Getwd() (*Path, error) {
+	wd, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+	return New(wd), nil
+}
