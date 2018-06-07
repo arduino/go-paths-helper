@@ -113,6 +113,31 @@ func (p *Path) Ext() string {
 	return filepath.Ext(p.path)
 }
 
+// HasPrefix returns true if the file name has one of the
+// given prefixes (the Base() method is used to obtain the
+// file name used for the comparison)
+func (p *Path) HasPrefix(prefixes ...string) bool {
+	filename := p.Base()
+	for _, prefix := range prefixes {
+		if strings.HasPrefix(filename, prefix) {
+			return true
+		}
+	}
+	return false
+}
+
+// HasSuffix returns true if the file name has one of the
+// given suffixies
+func (p *Path) HasSuffix(suffixies ...string) bool {
+	filename := p.String()
+	for _, suffix := range suffixies {
+		if strings.HasSuffix(filename, suffix) {
+			return true
+		}
+	}
+	return false
+}
+
 // RelTo returns a relative Path that is lexically equivalent to r when
 // joined to the current Path
 func (p *Path) RelTo(r *Path) (*Path, error) {
