@@ -31,7 +31,6 @@ package paths
 
 import (
 	"sort"
-	"strings"
 )
 
 // PathList is a list of Path
@@ -75,21 +74,63 @@ func (p *PathList) FilterDirs() {
 	*p = res
 }
 
+// FilterOutDirs remove all directories entries
+func (p *PathList) FilterOutDirs() {
+	res := (*p)[:0]
+	for _, path := range *p {
+		if isDir, _ := path.IsDir(); isDir {
+			res = append(res, path)
+		}
+	}
+	*p = res
+}
+
 // FilterOutHiddenFiles remove all hidden files (files with the name
 // starting with ".")
 func (p *PathList) FilterOutHiddenFiles() {
 	p.FilterOutPrefix(".")
 }
 
-// FilterOutPrefix remove all entries having the specified prefix
-func (p *PathList) FilterOutPrefix(prefix string) {
+func (p *PathList) filter(filter func(*Path) bool) {
 	res := (*p)[:0]
 	for _, path := range *p {
-		if !strings.HasPrefix(path.Base(), prefix) {
+		if filter(path) {
 			res = append(res, path)
 		}
 	}
 	*p = res
+}
+
+// FilterOutPrefix remove all entries having the specified prefixes
+func (p *PathList) FilterOutPrefix(prefixes ...string) {
+	filterFunction := func(path *Path) bool {
+		return !path.HasPrefix(prefixes...)
+	}
+	p.filter(filterFunction)
+}
+
+// FilterPrefix remove all entries not having one of the specified prefixes
+func (p *PathList) FilterPrefix(prefixes ...string) {
+	filterFunction := func(path *Path) bool {
+		return path.HasPrefix(prefixes...)
+	}
+	p.filter(filterFunction)
+}
+
+// FilterOutSuffix remove all entries having the specified suffix
+func (p *PathList) FilterOutSuffix(suffixies ...string) {
+	filterFunction := func(path *Path) bool {
+		return !path.HasSuffix(suffixies...)
+	}
+	p.filter(filterFunction)
+}
+
+// FilterSuffix remove all entries not having the specified prefix
+func (p *PathList) FilterSuffix(suffixies ...string) {
+	filterFunction := func(path *Path) bool {
+		return path.HasSuffix(suffixies...)
+	}
+	p.filter(filterFunction)
 }
 
 // Add adds a Path to the PathList
