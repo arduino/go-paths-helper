@@ -58,6 +58,12 @@ func New(path ...string) *Path {
 	return res
 }
 
+// NewFromFile creates a new Path object using the path name
+// obtained from the File object (see os.File.Name function).
+func NewFromFile(file *os.File) *Path {
+	return New(file.Name())
+}
+
 func (p *Path) setCachedFileInfo(info os.FileInfo) {
 	p.cachedFileInfo = info
 	p.cachedFileInfoTime = time.Now()
