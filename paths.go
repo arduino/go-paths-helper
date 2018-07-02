@@ -40,9 +40,7 @@ import (
 
 // Path represents a path
 type Path struct {
-	path               string
-	cachedFileInfo     os.FileInfo
-	cachedFileInfoTime time.Time
+	path string
 }
 
 // New creates a new Path object. If path is the empty string
@@ -64,30 +62,11 @@ func NewFromFile(file *os.File) *Path {
 	return New(file.Name())
 }
 
-func (p *Path) setCachedFileInfo(info os.FileInfo) {
-	p.cachedFileInfo = info
-	p.cachedFileInfoTime = time.Now()
-}
-
 // Stat returns a FileInfo describing the named file. The result is
 // cached internally for next queries. To ensure that the cached
 // FileInfo entry is updated just call Stat again.
 func (p *Path) Stat() (os.FileInfo, error) {
-	info, err := os.Stat(p.path)
-	if err != nil {
-		return nil, err
-	}
-	p.setCachedFileInfo(info)
-	return info, nil
-}
-
-func (p *Path) stat() (os.FileInfo, error) {
-	if p.cachedFileInfo != nil {
-		if p.cachedFileInfoTime.Add(50 * time.Millisecond).After(time.Now()) {
-			return p.cachedFileInfo, nil
-		}
-	}
-	return p.Stat()
+	return os.Stat(p.path)
 }
 
 // Clone create a copy of the Path object
@@ -226,13 +205,12 @@ func (p *Path) FollowSymLink() error {
 		return err
 	}
 	p.path = resolvedPath
-	p.cachedFileInfo = nil
 	return nil
 }
 
 // Exist return true if the path exists
 func (p *Path) Exist() (bool, error) {
-	_, err := p.stat()
+	_, err := p.Stat()
 	if err == nil {
 		return true, nil
 	}
@@ -244,7 +222,7 @@ func (p *Path) Exist() (bool, error) {
 
 // IsDir return true if the path exists and is a directory
 func (p *Path) IsDir() (bool, error) {
-	info, err := p.stat()
+	info, err := p.Stat()
 	if err == nil {
 		return info.IsDir(), nil
 	}
@@ -264,7 +242,6 @@ func (p *Path) ReadDir() (PathList, error) {
 	paths := PathList{}
 	for _, info := range infos {
 		path := p.Clone().Join(info.Name())
-		path.setCachedFileInfo(info)
 		paths.Add(path)
 	}
 	return paths, nil
