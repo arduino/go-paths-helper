@@ -210,6 +210,13 @@ func (p *Path) Rename(newpath *Path) error {
 	return os.Rename(p.path, newpath.path)
 }
 
+// MkTempDir creates a new temporary directory inside the path
+// pointed by the Path object with a name beginning with prefix
+// and returns the path of the new directory.
+func (p *Path) MkTempDir(prefix string) (*Path, error) {
+	return MkTempDir(p.path, prefix)
+}
+
 // FollowSymLink transforms the current path to the path pointed by the
 // symlink if path is a symlink, otherwise it does nothing
 func (p *Path) FollowSymLink() error {
