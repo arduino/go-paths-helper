@@ -179,6 +179,11 @@ func (p *Path) Parent() *Path {
 	return New(filepath.Dir(p.path))
 }
 
+// Mkdir create a directory denoted by the current path
+func (p *Path) Mkdir() error {
+	return os.Mkdir(p.path, 0755)
+}
+
 // MkdirAll creates a directory named path, along with any necessary
 // parents, and returns nil, or else returns an error
 func (p *Path) MkdirAll() error {
