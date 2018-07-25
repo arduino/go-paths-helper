@@ -202,6 +202,14 @@ func (p *Path) RemoveAll() error {
 	return os.RemoveAll(p.path)
 }
 
+// Rename renames (moves) the path to newpath. If newpath already exists
+// and is not a directory, Rename replaces it. OS-specific restrictions
+// may apply when oldpath and newpath are in different directories. If
+// there is an error, it will be of type *os.LinkError.
+func (p *Path) Rename(newpath *Path) error {
+	return os.Rename(p.path, newpath.path)
+}
+
 // FollowSymLink transforms the current path to the path pointed by the
 // symlink if path is a symlink, otherwise it does nothing
 func (p *Path) FollowSymLink() error {
