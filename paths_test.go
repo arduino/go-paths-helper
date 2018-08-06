@@ -169,3 +169,13 @@ func TestIsInsideDir(t *testing.T) {
 	inside(r5, r1)
 	notInside(r1, r5)
 }
+
+func TestReadFileAsLines(t *testing.T) {
+	lines, err := New("_testdata/anotherFile").ReadFileAsLines()
+	require.NoError(t, err)
+	require.Len(t, lines, 4)
+	require.Equal(t, "line 1", lines[0])
+	require.Equal(t, "line 2", lines[1])
+	require.Equal(t, "", lines[2])
+	require.Equal(t, "line 3", lines[3])
+}
