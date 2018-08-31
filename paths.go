@@ -315,12 +315,9 @@ func (p *Path) CopyDirTo(dst *Path) error {
 	src := p.Clean()
 	dst = dst.Clean()
 
-	srcInfo, err := src.Stat()
+	srcFiles, err := src.ReadDir()
 	if err != nil {
-		return fmt.Errorf("getting stat infor for %s: %s", src, err)
-	}
-	if !srcInfo.IsDir() {
-		return fmt.Errorf("%s is not a directory", src)
+		return fmt.Errorf("error reading source dir %s: %s", src, err)
 	}
 
 	if exist, err := dst.Exist(); exist {
@@ -332,13 +329,13 @@ func (p *Path) CopyDirTo(dst *Path) error {
 	if err := dst.MkdirAll(); err != nil {
 		return fmt.Errorf("creating destination dir %s: %s", dst, err)
 	}
+
+	srcInfo, err := src.Stat()
+	if err != nil {
+		return fmt.Errorf("getting stat info for %s: %s", src, err)
+	}
 	if err := os.Chmod(dst.path, srcInfo.Mode()); err != nil {
 		return fmt.Errorf("setting permission for dir %s: %s", dst, err)
-	}
-
-	srcFiles, err := src.ReadDir()
-	if err != nil {
-		return fmt.Errorf("error reading source dir %s: %s", src, err)
 	}
 
 	for _, srcPath := range srcFiles {
