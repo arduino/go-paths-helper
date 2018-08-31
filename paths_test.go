@@ -179,3 +179,27 @@ func TestReadFileAsLines(t *testing.T) {
 	require.Equal(t, "", lines[2])
 	require.Equal(t, "line 3", lines[3])
 }
+
+func TestCopyDir(t *testing.T) {
+	tmp, err := MkTempDir("", "")
+	require.NoError(t, err)
+	defer tmp.RemoveAll()
+
+	src := New("_testdata")
+	err = src.CopyDirTo(tmp.Join("dest"))
+	require.NoError(t, err, "copying dir")
+
+	exist, err := tmp.Join("dest", "folder", "subfolder", "file4").Exist()
+	require.True(t, exist)
+	require.NoError(t, err)
+
+	isdir, err := tmp.Join("dest", "folder", "subfolder", "file4").IsDir()
+	require.False(t, isdir)
+	require.NoError(t, err)
+
+	err = src.CopyDirTo(tmp.Join("dest"))
+	require.Error(t, err, "copying dir to already existing")
+
+	err = src.Join("file").CopyDirTo(tmp.Join("dest2"))
+	require.Error(t, err, "copying file as dir")
+}
