@@ -241,8 +241,24 @@ func (p *Path) Exist() (bool, error) {
 	return false, err
 }
 
-// IsDir return true if the path exists and is a directory
-func (p *Path) IsDir() (bool, error) {
+// IsDir returns true if the path exists and is a directory. In all the other
+// cases (and also in case of any error) false is returned.
+func (p *Path) IsDir() bool {
+	isdir, err := p.IsDirCheck()
+	return isdir && err == nil
+}
+
+// IsNotDir returns true if the path exists and is NOT a directory. In all the other
+// cases (and also in case of any error) false is returned.
+func (p *Path) IsNotDir() bool {
+	isdir, err := p.IsDirCheck()
+	return !isdir && err == nil
+}
+
+// IsDirCheck return true if the path exists and is a directory or false
+// if the path exists and is not a directory. In all the other case false and
+// the corresponding error is returned.
+func (p *Path) IsDirCheck() (bool, error) {
 	info, err := p.Stat()
 	if err == nil {
 		return info.IsDir(), nil

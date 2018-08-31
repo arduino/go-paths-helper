@@ -53,7 +53,7 @@ func TestPathNew(t *testing.T) {
 func TestPath(t *testing.T) {
 	testPath := New("_testdata")
 	require.Equal(t, "_testdata", testPath.String())
-	isDir, err := testPath.IsDir()
+	isDir, err := testPath.IsDirCheck()
 	require.True(t, isDir)
 	require.NoError(t, err)
 	exist, err := testPath.Exist()
@@ -62,7 +62,7 @@ func TestPath(t *testing.T) {
 
 	folderPath := testPath.Join("folder")
 	require.Equal(t, "_testdata/folder", folderPath.String())
-	isDir, err = folderPath.IsDir()
+	isDir, err = folderPath.IsDirCheck()
 	require.True(t, isDir)
 	require.NoError(t, err)
 	exist, err = folderPath.Exist()
@@ -71,7 +71,7 @@ func TestPath(t *testing.T) {
 
 	filePath := testPath.Join("file")
 	require.Equal(t, "_testdata/file", filePath.String())
-	isDir, err = filePath.IsDir()
+	isDir, err = filePath.IsDirCheck()
 	require.False(t, isDir)
 	require.NoError(t, err)
 	exist, err = filePath.Exist()
@@ -80,7 +80,7 @@ func TestPath(t *testing.T) {
 
 	anotherFilePath := filePath.Join("notexistent")
 	require.Equal(t, "_testdata/file/notexistent", anotherFilePath.String())
-	isDir, err = anotherFilePath.IsDir()
+	isDir, err = anotherFilePath.IsDirCheck()
 	require.False(t, isDir)
 	require.Error(t, err)
 	exist, err = anotherFilePath.Exist()
@@ -122,7 +122,7 @@ func TestResetStatCacheWhenFollowingSymlink(t *testing.T) {
 		if file.Base() == "symlinktofolder" {
 			err = file.FollowSymLink()
 			require.NoError(t, err)
-			isDir, err := file.IsDir()
+			isDir, err := file.IsDirCheck()
 			require.NoError(t, err)
 			require.True(t, isDir)
 			break
@@ -193,7 +193,7 @@ func TestCopyDir(t *testing.T) {
 	require.True(t, exist)
 	require.NoError(t, err)
 
-	isdir, err := tmp.Join("dest", "folder", "subfolder", "file4").IsDir()
+	isdir, err := tmp.Join("dest", "folder", "subfolder", "file4").IsDirCheck()
 	require.False(t, isdir)
 	require.NoError(t, err)
 
