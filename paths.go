@@ -229,8 +229,23 @@ func (p *Path) FollowSymLink() error {
 	return nil
 }
 
-// Exist return true if the path exists
-func (p *Path) Exist() (bool, error) {
+// Exist return true if the file denoted by this path exists, false
+// in any other case (also in case of error).
+func (p *Path) Exist() bool {
+	exist, err := p.ExistCheck()
+	return exist && err == nil
+}
+
+// NotExist return true if the file denoted by this path DO NOT exists, false
+// in any other case (also in case of error).
+func (p *Path) NotExist() bool {
+	exist, err := p.ExistCheck()
+	return !exist && err == nil
+}
+
+// ExistCheck return true if the path exists or false if the path doesn't exists.
+// In case the check fails false is returned together with the corresponding error.
+func (p *Path) ExistCheck() (bool, error) {
 	_, err := p.Stat()
 	if err == nil {
 		return true, nil
@@ -336,7 +351,7 @@ func (p *Path) CopyDirTo(dst *Path) error {
 		return fmt.Errorf("error reading source dir %s: %s", src, err)
 	}
 
-	if exist, err := dst.Exist(); exist {
+	if exist, err := dst.ExistCheck(); exist {
 		return fmt.Errorf("destination %s already exists", dst)
 	} else if err != nil {
 		return fmt.Errorf("checking if %s exists: %s", dst, err)

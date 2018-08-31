@@ -56,7 +56,7 @@ func TestPath(t *testing.T) {
 	isDir, err := testPath.IsDirCheck()
 	require.True(t, isDir)
 	require.NoError(t, err)
-	exist, err := testPath.Exist()
+	exist, err := testPath.ExistCheck()
 	require.True(t, exist)
 	require.NoError(t, err)
 
@@ -65,7 +65,7 @@ func TestPath(t *testing.T) {
 	isDir, err = folderPath.IsDirCheck()
 	require.True(t, isDir)
 	require.NoError(t, err)
-	exist, err = folderPath.Exist()
+	exist, err = folderPath.ExistCheck()
 	require.True(t, exist)
 	require.NoError(t, err)
 
@@ -74,7 +74,7 @@ func TestPath(t *testing.T) {
 	isDir, err = filePath.IsDirCheck()
 	require.False(t, isDir)
 	require.NoError(t, err)
-	exist, err = filePath.Exist()
+	exist, err = filePath.ExistCheck()
 	require.True(t, exist)
 	require.NoError(t, err)
 
@@ -83,7 +83,7 @@ func TestPath(t *testing.T) {
 	isDir, err = anotherFilePath.IsDirCheck()
 	require.False(t, isDir)
 	require.Error(t, err)
-	exist, err = anotherFilePath.Exist()
+	exist, err = anotherFilePath.ExistCheck()
 	require.False(t, exist)
 	require.Error(t, err)
 
@@ -189,7 +189,7 @@ func TestCopyDir(t *testing.T) {
 	err = src.CopyDirTo(tmp.Join("dest"))
 	require.NoError(t, err, "copying dir")
 
-	exist, err := tmp.Join("dest", "folder", "subfolder", "file4").Exist()
+	exist, err := tmp.Join("dest", "folder", "subfolder", "file4").ExistCheck()
 	require.True(t, exist)
 	require.NoError(t, err)
 
