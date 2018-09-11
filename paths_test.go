@@ -151,13 +151,13 @@ func TestIsInsideDir(t *testing.T) {
 	inside := func(a, b *Path) {
 		in, err := a.IsInsideDir(b)
 		require.NoError(t, err)
-		require.True(t, in)
+		require.True(t, in, "%s is inside %s", a, b)
 	}
 
 	notInside := func(a, b *Path) {
 		in, err := a.IsInsideDir(b)
 		require.NoError(t, err)
-		require.False(t, in)
+		require.False(t, in, "%s is inside %s", a, b)
 	}
 
 	f1 := New("/a/b/c")
@@ -185,6 +185,11 @@ func TestIsInsideDir(t *testing.T) {
 	notInside(r1, r4)
 	inside(r5, r1)
 	notInside(r1, r5)
+
+	f4 := New("/home/megabug/aide/arduino-1.8.6/hardware/arduino/avr")
+	f5 := New("/home/megabug/a15/packages")
+	notInside(f5, f4)
+	notInside(f4, f5)
 }
 
 func TestReadFileAsLines(t *testing.T) {
