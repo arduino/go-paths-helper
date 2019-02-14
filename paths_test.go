@@ -225,3 +225,21 @@ func TestCopyDir(t *testing.T) {
 	err = src.Join("file").CopyDirTo(tmp.Join("dest2"))
 	require.Error(t, err, "copying file as dir")
 }
+
+func TestParents(t *testing.T) {
+	parents := New("/a/very/long/path").Parents()
+	require.Len(t, parents, 5)
+	require.Equal(t, "/a/very/long/path", parents[0].String())
+	require.Equal(t, "/a/very/long", parents[1].String())
+	require.Equal(t, "/a/very", parents[2].String())
+	require.Equal(t, "/a", parents[3].String())
+	require.Equal(t, "/", parents[4].String())
+
+	parents2 := New("a/very/relative/path").Parents()
+	require.Len(t, parents, 5)
+	require.Equal(t, "a/very/relative/path", parents2[0].String())
+	require.Equal(t, "a/very/relative", parents2[1].String())
+	require.Equal(t, "a/very", parents2[2].String())
+	require.Equal(t, "a", parents2[3].String())
+	require.Equal(t, ".", parents2[4].String())
+}
