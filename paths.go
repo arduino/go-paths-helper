@@ -48,7 +48,10 @@ type Path struct {
 // then nil is returned.
 func New(path ...string) *Path {
 	if len(path) == 0 {
-		return New("")
+		return nil
+	}
+	if len(path) == 1 && path[0] == "" {
+		return nil
 	}
 	res := &Path{path: path[0]}
 	if len(path) > 1 {
