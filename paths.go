@@ -436,6 +436,12 @@ func (p *Path) Truncate() error {
 	return p.WriteFile([]byte{})
 }
 
+// Open opens the named file for reading. It calls os.Open on the
+// underlying path.
+func (p *Path) Open() (*os.File, error) {
+	return os.Open(p.path)
+}
+
 // EqualsTo return true if both paths are equal
 func (p *Path) EqualsTo(other *Path) bool {
 	return p.path == other.path
