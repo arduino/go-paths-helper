@@ -436,7 +436,7 @@ func (p *Path) Truncate() error {
 	return p.WriteFile([]byte{})
 }
 
-// Open opens the named file for reading. It calls os.Open on the
+// Open opens a file for reading. It calls os.Open on the
 // underlying path.
 func (p *Path) Open() (*os.File, error) {
 	return os.Open(p.path)
