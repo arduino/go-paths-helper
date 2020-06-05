@@ -431,7 +431,7 @@ func (p *Path) ReadFileAsLines() ([]string, error) {
 }
 
 // Truncate create an empty file named by path or if the file already
-// exist it trucates it (delete all contents)
+// exist it truncates it (delete all contents)
 func (p *Path) Truncate() error {
 	return p.WriteFile([]byte{})
 }
