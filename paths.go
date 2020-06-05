@@ -442,6 +442,12 @@ func (p *Path) Open() (*os.File, error) {
 	return os.Open(p.path)
 }
 
+// Create creates or truncates a file. It calls os.Create
+// on the underlying path.
+func (p *Path) Create() (*os.File, error) {
+	return os.Create(p.path)
+}
+
 // EqualsTo return true if both paths are equal
 func (p *Path) EqualsTo(other *Path) bool {
 	return p.path == other.path
