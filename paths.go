@@ -30,6 +30,7 @@
 package paths
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -37,6 +38,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 // Path represents a path
@@ -60,6 +62,24 @@ func New(path ...string) *Path {
 	return res
 }
 
+// SafeNew behaves as New except if the provided path is not
+// a valid UTF8 string: in that case an error is returned.
+func SafeNew(paths ...string) (*Path, error) {
+	if err := pathIsSafe(paths...); err != nil {
+		return nil, err
+	}
+	return New(paths...), nil
+}
+
+func pathIsSafe(paths ...string) error {
+	for _, path := range paths {
+		if !utf8.ValidString(path) {
+			return errors.New("invalid utf8 encoding in path")
+		}
+	}
+	return nil
+}
+
 // NewFromFile creates a new Path object using the path name
 // obtained from the File object (see os.File.Name function).
 func NewFromFile(file *os.File) *Path {
@@ -81,6 +101,15 @@ func (p *Path) Clone() *Path {
 // Join create a new Path by joining the provided paths
 func (p *Path) Join(paths ...string) *Path {
 	return New(filepath.Join(p.path, filepath.Join(paths...)))
+}
+
+// SafeJoin behaves as Join except if the provided path is not
+// a valid UTF8 string: in that case an error is returned.
+func (p *Path) SafeJoin(paths ...string) (*Path, error) {
+	if err := pathIsSafe(paths...); err != nil {
+		return nil, err
+	}
+	return p.Join(paths...), nil
 }
 
 // JoinPath create a new Path by joining the provided paths

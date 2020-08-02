@@ -50,6 +50,36 @@ func TestPathNew(t *testing.T) {
 	require.Nil(t, test4)
 }
 
+func TestPathSafetyFeatures(t *testing.T) {
+	test1, err1 := SafeNew("path")
+	require.Equal(t, "path", test1.String())
+	require.NoError(t, err1)
+
+	test2, err2 := SafeNew("path", "path")
+	require.Equal(t, filepath.Join("path", "path"), test2.String())
+	require.NoError(t, err2)
+
+	test3, err3 := SafeNew("path" + string([]byte{0xC0, 0xAF}) + "path")
+	require.Nil(t, test3)
+	require.Error(t, err3)
+
+	test4, err4 := SafeNew("path", "path"+string([]byte{0xC0, 0xAF})+"path")
+	require.Nil(t, test4)
+	require.Error(t, err4)
+
+	test5, err5 := test1.SafeJoin("path")
+	require.Equal(t, filepath.Join("path", "path"), test5.String())
+	require.NoError(t, err5)
+
+	test6, err6 := test1.SafeJoin("path" + string([]byte{0xC0, 0xAF}) + "path")
+	require.Nil(t, test6)
+	require.Error(t, err6)
+
+	test7, err7 := test1.SafeJoin("path", "path"+string([]byte{0xC0, 0xAF})+"path")
+	require.Nil(t, test7)
+	require.Error(t, err7)
+}
+
 func TestPath(t *testing.T) {
 	testPath := New("_testdata")
 	require.Equal(t, "_testdata", testPath.String())
