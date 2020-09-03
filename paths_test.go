@@ -266,3 +266,39 @@ func TestReadDirRecursive(t *testing.T) {
 	require.Equal(t, "_testdata/symlinktofolder/subfolder", list[12].String())
 	require.Equal(t, "_testdata/symlinktofolder/subfolder/file4", list[13].String())
 }
+
+func TestFilterDirs(t *testing.T) {
+	testPath := New("_testdata")
+
+	list, err := testPath.ReadDir()
+	require.NoError(t, err)
+	require.Len(t, list, 4)
+
+	require.Equal(t, "_testdata/anotherFile", list[0].String())
+	require.Equal(t, "_testdata/file", list[1].String())
+	require.Equal(t, "_testdata/folder", list[2].String())
+	require.Equal(t, "_testdata/symlinktofolder", list[3].String())
+
+	list.FilterDirs()
+	require.Len(t, list, 2)
+	require.Equal(t, "_testdata/folder", list[0].String())
+	require.Equal(t, "_testdata/symlinktofolder", list[1].String())
+}
+
+func TestFilterOutDirs(t *testing.T) {
+	testPath := New("_testdata")
+
+	list, err := testPath.ReadDir()
+	require.NoError(t, err)
+	require.Len(t, list, 4)
+
+	require.Equal(t, "_testdata/anotherFile", list[0].String())
+	require.Equal(t, "_testdata/file", list[1].String())
+	require.Equal(t, "_testdata/folder", list[2].String())
+	require.Equal(t, "_testdata/symlinktofolder", list[3].String())
+
+	list.FilterOutDirs()
+	require.Len(t, list, 2)
+	require.Equal(t, "_testdata/anotherFile", list[0].String())
+	require.Equal(t, "_testdata/file", list[1].String())
+}

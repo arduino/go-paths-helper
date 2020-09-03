@@ -78,7 +78,7 @@ func (p *PathList) FilterDirs() {
 func (p *PathList) FilterOutDirs() {
 	res := (*p)[:0]
 	for _, path := range *p {
-		if path.IsDir() {
+		if path.IsNotDir() {
 			res = append(res, path)
 		}
 	}
