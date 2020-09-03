@@ -302,6 +302,30 @@ func (p *Path) ReadDir() (PathList, error) {
 	return paths, nil
 }
 
+// ReadDirRecursive returns a PathList containing the content of the directory
+// and its subdirectories pointed by the current Path
+func (p *Path) ReadDirRecursive() (PathList, error) {
+	infos, err := ioutil.ReadDir(p.path)
+	if err != nil {
+		return nil, err
+	}
+	paths := PathList{}
+	for _, info := range infos {
+		path := p.Clone().Join(info.Name())
+		paths.Add(path)
+
+		if path.IsDir() {
+			subPaths, err := path.ReadDirRecursive()
+			if err != nil {
+				return nil, err
+			}
+			paths.AddAll(subPaths)
+		}
+
+	}
+	return paths, nil
+}
+
 // CopyTo copies the contents of the file named src to the file named
 // by dst. The file will be created if it does not already exist. If the
 // destination file exists, all it's contents will be replaced by the contents

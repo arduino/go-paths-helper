@@ -243,3 +243,26 @@ func TestParents(t *testing.T) {
 	require.Equal(t, "a", parents2[3].String())
 	require.Equal(t, ".", parents2[4].String())
 }
+
+func TestReadDirRecursive(t *testing.T) {
+	testPath := New("_testdata")
+
+	list, err := testPath.ReadDirRecursive()
+	require.NoError(t, err)
+	require.Len(t, list, 14)
+
+	require.Equal(t, "_testdata/anotherFile", list[0].String())
+	require.Equal(t, "_testdata/file", list[1].String())
+	require.Equal(t, "_testdata/folder", list[2].String())
+	require.Equal(t, "_testdata/folder/.hidden", list[3].String())
+	require.Equal(t, "_testdata/folder/file2", list[4].String())
+	require.Equal(t, "_testdata/folder/file3", list[5].String())
+	require.Equal(t, "_testdata/folder/subfolder", list[6].String())
+	require.Equal(t, "_testdata/folder/subfolder/file4", list[7].String())
+	require.Equal(t, "_testdata/symlinktofolder", list[8].String())
+	require.Equal(t, "_testdata/symlinktofolder/.hidden", list[9].String())
+	require.Equal(t, "_testdata/symlinktofolder/file2", list[10].String())
+	require.Equal(t, "_testdata/symlinktofolder/file3", list[11].String())
+	require.Equal(t, "_testdata/symlinktofolder/subfolder", list[12].String())
+	require.Equal(t, "_testdata/symlinktofolder/subfolder/file4", list[13].String())
+}
