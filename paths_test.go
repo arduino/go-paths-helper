@@ -302,3 +302,12 @@ func TestFilterOutDirs(t *testing.T) {
 	require.Equal(t, "_testdata/anotherFile", list[0].String())
 	require.Equal(t, "_testdata/file", list[1].String())
 }
+
+func TestEquivalentPaths(t *testing.T) {
+	wd, err := Getwd()
+	require.NoError(t, err)
+	require.True(t, New("file1").EquivalentTo(New("file1", "somethingelse", "..")))
+	require.True(t, New("file1", "abc").EquivalentTo(New("file1", "abc", "def", "..")))
+	require.True(t, wd.Join("file1").EquivalentTo(New("file1")))
+	require.True(t, wd.Join("file1").EquivalentTo(New("file1", "abc", "..")))
+}

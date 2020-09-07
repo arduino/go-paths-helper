@@ -478,9 +478,21 @@ func (p *Path) EqualsTo(other *Path) bool {
 }
 
 // EquivalentTo return true if both paths are equivalent (they points to the
-// same file even if they are lexicographically different)
+// same file even if they are lexicographically different) based on the current
+// working directory.
 func (p *Path) EquivalentTo(other *Path) bool {
-	return p.Clean().path == other.Clean().path
+	if p.Clean().path == other.Clean().path {
+		return true
+	}
+	absP, err := p.Abs()
+	if err != nil {
+		return false
+	}
+	absOther, err := other.Abs()
+	if err != nil {
+		return false
+	}
+	return absP.path == absOther.path
 }
 
 // Parents returns all the parents directories of the current path. If the path is absolute
