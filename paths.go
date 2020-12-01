@@ -472,6 +472,11 @@ func (p *Path) Create() (*os.File, error) {
 	return os.Create(p.path)
 }
 
+// Append opens a file for append or creates it if the file doesn't exist.
+func (p *Path) Append() (*os.File, error) {
+	return os.OpenFile(p.path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0666)
+}
+
 // EqualsTo return true if both paths are equal
 func (p *Path) EqualsTo(other *Path) bool {
 	return p.path == other.path
