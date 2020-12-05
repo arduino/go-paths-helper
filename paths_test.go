@@ -31,6 +31,7 @@ package paths
 
 import (
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -336,4 +337,19 @@ func TestRelativeTo(t *testing.T) {
 	res, err = New("my/path").RelFrom(New("/other/path"))
 	require.Error(t, err)
 	require.Nil(t, res)
+}
+
+func TestWriteToTempFile(t *testing.T) {
+	tmpDir := New("_testdata", "tmp")
+	tmpData := []byte("test")
+	tmp, err := WriteToTempFile(tmpData, tmpDir, "prefix")
+	defer tmp.Remove()
+	require.NoError(t, err)
+	require.True(t, strings.HasPrefix(tmp.Base(), "prefix"))
+	inside, err := tmp.IsInsideDir(tmpDir)
+	require.NoError(t, err)
+	require.True(t, inside)
+	data, err := tmp.ReadFile()
+	require.NoError(t, err)
+	require.Equal(t, tmpData, data)
 }

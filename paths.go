@@ -37,6 +37,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 // Path represents a path
@@ -455,6 +457,23 @@ func (p *Path) ReadFile() ([]byte, error) {
 // it before writing.
 func (p *Path) WriteFile(data []byte) error {
 	return ioutil.WriteFile(p.path, data, os.FileMode(0644))
+}
+
+// WriteToTempFile writes data to a newly generated temporary file.
+// dir and prefix have the same meaning for MkTempFile.
+// In case of success the Path to the temp file is returned.
+func WriteToTempFile(data []byte, dir *Path, prefix string) (res *Path, err error) {
+	f, err := MkTempFile(dir, prefix)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	if n, err := f.Write(data); err != nil {
+		return nil, err
+	} else if n < len(data) {
+		return nil, errors.Errorf("could not write all data (written %d bytes out of %d)", n, len(data))
+	}
+	return New(f.Name()), nil
 }
 
 // ReadFileAsLines reads the file named by filename and returns it as an
