@@ -128,9 +128,25 @@ func (p *Path) HasSuffix(suffixies ...string) bool {
 }
 
 // RelTo returns a relative Path that is lexically equivalent to r when
-// joined to the current Path
+// joined to the current Path.
+//
+// For example paths.New("/my/path/ab/cd").RelTo(paths.New("/my/path"))
+// returns "../..".
 func (p *Path) RelTo(r *Path) (*Path, error) {
 	rel, err := filepath.Rel(p.path, r.path)
+	if err != nil {
+		return nil, err
+	}
+	return New(rel), nil
+}
+
+// RelFrom returns a relative Path that when joined with r is lexically
+// equivalent to the current path.
+//
+// For example paths.New("/my/path/ab/cd").RelFrom(paths.New("/my/path"))
+// returns "ab/cd".
+func (p *Path) RelFrom(r *Path) (*Path, error) {
+	rel, err := filepath.Rel(r.path, p.path)
 	if err != nil {
 		return nil, err
 	}

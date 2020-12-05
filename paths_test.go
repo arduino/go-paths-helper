@@ -311,3 +311,29 @@ func TestEquivalentPaths(t *testing.T) {
 	require.True(t, wd.Join("file1").EquivalentTo(New("file1")))
 	require.True(t, wd.Join("file1").EquivalentTo(New("file1", "abc", "..")))
 }
+
+func TestRelativeTo(t *testing.T) {
+	res, err := New("/my/abs/path/123/456").RelTo(New("/my/abs/path"))
+	require.NoError(t, err)
+	require.Equal(t, "../..", res.String())
+
+	res, err = New("/my/abs/path").RelTo(New("/my/abs/path/123/456"))
+	require.NoError(t, err)
+	require.Equal(t, "123/456", res.String())
+
+	res, err = New("my/path").RelTo(New("/other/path"))
+	require.Error(t, err)
+	require.Nil(t, res)
+
+	res, err = New("/my/abs/path/123/456").RelFrom(New("/my/abs/path"))
+	require.Equal(t, "123/456", res.String())
+	require.NoError(t, err)
+
+	res, err = New("/my/abs/path").RelFrom(New("/my/abs/path/123/456"))
+	require.NoError(t, err)
+	require.Equal(t, "../..", res.String())
+
+	res, err = New("my/path").RelFrom(New("/other/path"))
+	require.Error(t, err)
+	require.Nil(t, res)
+}
