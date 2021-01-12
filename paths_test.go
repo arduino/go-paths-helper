@@ -321,6 +321,25 @@ func TestEquivalentPaths(t *testing.T) {
 	}
 }
 
+func TestCanonicalize(t *testing.T) {
+	wd, err := Getwd()
+	require.NoError(t, err)
+
+	p := New("_testdata", "anotherFile").Canonical()
+	require.Equal(t, wd.Join("_testdata", "anotherFile").String(), p.String())
+
+	p = New("_testdata", "nonexistentFile").Canonical()
+	require.Equal(t, wd.Join("_testdata", "nonexistentFile").String(), p.String())
+
+	if runtime.GOOS == "windows" {
+		q := New("_testdata", "ANOTHE~1").Canonical()
+		require.Equal(t, wd.Join("_testdata", "anotherFile").String(), q.String())
+
+		r := New("c:\\").Canonical()
+		require.Equal(t, "C:\\", r.String())
+	}
+}
+
 func TestRelativeTo(t *testing.T) {
 	res, err := New("/my/abs/path/123/456").RelTo(New("/my/abs/path"))
 	require.NoError(t, err)

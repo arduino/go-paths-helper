@@ -564,3 +564,18 @@ func (p *Path) Parents() []*Path {
 func (p *Path) String() string {
 	return p.path
 }
+
+// Canonical return a "canonical" Path for the given filename.
+// The meaning of "canonical" is OS-dependent but the goal of this method
+// is to always return the same path for a given file (factoring out all the
+// possibile ambiguities including, for example, relative paths traversal,
+// symlinks, drive volume letter case, etc).
+func (p *Path) Canonical() *Path {
+	canonical := p.Clone()
+	// https://github.com/golang/go/issues/17084#issuecomment-246645354
+	canonical.FollowSymLink()
+	if absPath, err := canonical.Abs(); err == nil {
+		canonical = absPath
+	}
+	return canonical
+}
