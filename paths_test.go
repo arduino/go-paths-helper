@@ -368,6 +368,10 @@ func TestRelativeTo(t *testing.T) {
 
 func TestWriteToTempFile(t *testing.T) {
 	tmpDir := New("_testdata", "tmp")
+	err := tmpDir.MkdirAll()
+	require.NoError(t, err)
+	defer tmpDir.RemoveAll()
+
 	tmpData := []byte("test")
 	tmp, err := WriteToTempFile(tmpData, tmpDir, "prefix")
 	defer tmp.Remove()
