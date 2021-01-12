@@ -31,6 +31,7 @@ package paths
 
 import (
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -311,6 +312,13 @@ func TestEquivalentPaths(t *testing.T) {
 	require.True(t, New("file1", "abc").EquivalentTo(New("file1", "abc", "def", "..")))
 	require.True(t, wd.Join("file1").EquivalentTo(New("file1")))
 	require.True(t, wd.Join("file1").EquivalentTo(New("file1", "abc", "..")))
+
+	if runtime.GOOS == "windows" {
+		q := New("_testdata", "anotherFile")
+		r := New("_testdata", "ANOTHE~1")
+		require.True(t, q.EquivalentTo(r))
+		require.True(t, r.EquivalentTo(q))
+	}
 }
 
 func TestRelativeTo(t *testing.T) {
