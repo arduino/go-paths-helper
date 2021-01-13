@@ -524,15 +524,22 @@ func (p *Path) EquivalentTo(other *Path) bool {
 	if p.Clean().path == other.Clean().path {
 		return true
 	}
-	absP, err := p.Abs()
-	if err != nil {
-		return false
+
+	if infoP, err := p.Stat(); err != nil {
+		// go ahead with the next test...
+	} else if infoOther, err := other.Stat(); err != nil {
+		// go ahead with the next test...
+	} else if os.SameFile(infoP, infoOther) {
+		return true
 	}
-	absOther, err := other.Abs()
-	if err != nil {
+
+	if absP, err := p.Abs(); err != nil {
 		return false
+	} else if absOther, err := other.Abs(); err != nil {
+		return false
+	} else {
+		return absP.path == absOther.path
 	}
-	return absP.path == absOther.path
 }
 
 // Parents returns all the parents directories of the current path. If the path is absolute
@@ -556,4 +563,19 @@ func (p *Path) Parents() []*Path {
 
 func (p *Path) String() string {
 	return p.path
+}
+
+// Canonical return a "canonical" Path for the given filename.
+// The meaning of "canonical" is OS-dependent but the goal of this method
+// is to always return the same path for a given file (factoring out all the
+// possibile ambiguities including, for example, relative paths traversal,
+// symlinks, drive volume letter case, etc).
+func (p *Path) Canonical() *Path {
+	canonical := p.Clone()
+	// https://github.com/golang/go/issues/17084#issuecomment-246645354
+	canonical.FollowSymLink()
+	if absPath, err := canonical.Abs(); err == nil {
+		canonical = absPath
+	}
+	return canonical
 }

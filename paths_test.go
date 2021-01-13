@@ -31,6 +31,7 @@ package paths
 
 import (
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -311,6 +312,32 @@ func TestEquivalentPaths(t *testing.T) {
 	require.True(t, New("file1", "abc").EquivalentTo(New("file1", "abc", "def", "..")))
 	require.True(t, wd.Join("file1").EquivalentTo(New("file1")))
 	require.True(t, wd.Join("file1").EquivalentTo(New("file1", "abc", "..")))
+
+	if runtime.GOOS == "windows" {
+		q := New("_testdata", "anotherFile")
+		r := New("_testdata", "ANOTHE~1")
+		require.True(t, q.EquivalentTo(r))
+		require.True(t, r.EquivalentTo(q))
+	}
+}
+
+func TestCanonicalize(t *testing.T) {
+	wd, err := Getwd()
+	require.NoError(t, err)
+
+	p := New("_testdata", "anotherFile").Canonical()
+	require.Equal(t, wd.Join("_testdata", "anotherFile").String(), p.String())
+
+	p = New("_testdata", "nonexistentFile").Canonical()
+	require.Equal(t, wd.Join("_testdata", "nonexistentFile").String(), p.String())
+
+	if runtime.GOOS == "windows" {
+		q := New("_testdata", "ANOTHE~1").Canonical()
+		require.Equal(t, wd.Join("_testdata", "anotherFile").String(), q.String())
+
+		r := New("c:\\").Canonical()
+		require.Equal(t, "C:\\", r.String())
+	}
 }
 
 func TestRelativeTo(t *testing.T) {
@@ -341,6 +368,10 @@ func TestRelativeTo(t *testing.T) {
 
 func TestWriteToTempFile(t *testing.T) {
 	tmpDir := New("_testdata", "tmp")
+	err := tmpDir.MkdirAll()
+	require.NoError(t, err)
+	defer tmpDir.RemoveAll()
+
 	tmpData := []byte("test")
 	tmp, err := WriteToTempFile(tmpData, tmpDir, "prefix")
 	defer tmp.Remove()
