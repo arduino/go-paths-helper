@@ -35,9 +35,6 @@ jobs:
         run: go test -v ./... -coverprofile=coverage_unit.txt
 
       - name: Send unit tests coverage to Codecov
-        if: >
-          matrix.operating-system == 'ubuntu-latest' &&
-          github.event_name == 'push'
         uses: codecov/codecov-action@v1
         with:
           file: ./coverage_unit.txt
