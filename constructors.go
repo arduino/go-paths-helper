@@ -45,7 +45,7 @@ func NullPath() *Path {
 
 // TempDir returns the default path to use for temporary files
 func TempDir() *Path {
-	return New(os.TempDir())
+	return New(os.TempDir()).Canonical()
 }
 
 // MkTempDir creates a new temporary directory in the directory

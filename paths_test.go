@@ -208,6 +208,10 @@ func TestReadFileAsLines(t *testing.T) {
 	require.Equal(t, "line 3", lines[3])
 }
 
+func TestCanonicaTempDir(t *testing.T) {
+	require.Equal(t, TempDir().String(), TempDir().Canonical().String())
+}
+
 func TestCopyDir(t *testing.T) {
 	tmp, err := MkTempDir("", "")
 	require.NoError(t, err)
