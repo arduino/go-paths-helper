@@ -57,7 +57,7 @@ func MkTempDir(dir, prefix string) (*Path, error) {
 	if err != nil {
 		return nil, err
 	}
-	return New(path), nil
+	return New(path).Canonical(), nil
 }
 
 // MkTempFile creates a new temporary file in the directory dir with a name beginning with prefix,
