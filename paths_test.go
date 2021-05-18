@@ -341,6 +341,10 @@ func TestCanonicalize(t *testing.T) {
 
 		r := New("c:\\").Canonical()
 		require.Equal(t, "C:\\", r.String())
+
+		tmp, err := MkTempDir("", "pref")
+		require.NoError(t, err)
+		require.Equal(t, tmp.String(), tmp.Canonical().String())
 	}
 }
 
