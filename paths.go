@@ -299,9 +299,6 @@ func (p *Path) IsDirCheck() (bool, error) {
 	if err == nil {
 		return info.IsDir(), nil
 	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
 	return false, err
 }
 
