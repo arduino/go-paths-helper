@@ -106,9 +106,9 @@ func TestPath(t *testing.T) {
 	require.False(t, anotherFilePath.IsNotDir())
 	exist, err = anotherFilePath.ExistCheck()
 	require.False(t, exist)
-	require.Error(t, err)
+	require.NoError(t, err)
 	require.False(t, anotherFilePath.Exist())
-	require.False(t, anotherFilePath.NotExist())
+	require.True(t, anotherFilePath.NotExist())
 
 	list, err := folderPath.ReadDir()
 	require.NoError(t, err)

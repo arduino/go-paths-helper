@@ -36,6 +36,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/pkg/errors"
@@ -272,6 +273,9 @@ func (p *Path) ExistCheck() (bool, error) {
 		return true, nil
 	}
 	if os.IsNotExist(err) {
+		return false, nil
+	}
+	if err.(*os.PathError).Err == syscall.ENOTDIR {
 		return false, nil
 	}
 	return false, err
