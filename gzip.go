@@ -51,7 +51,7 @@ func GUnzip(src, dest *Path) error {
 
 	in, err := gzip.NewReader(gzIn)
 	if err != nil {
-		return errors.Wrap(err, "decoding "+dest.String())
+		return errors.Wrap(err, "decoding "+src.String())
 	}
 	defer in.Close()
 
