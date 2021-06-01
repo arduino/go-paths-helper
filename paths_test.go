@@ -259,7 +259,7 @@ func TestReadDirRecursive(t *testing.T) {
 
 	list, err := testPath.ReadDirRecursive()
 	require.NoError(t, err)
-	require.Len(t, list, 14)
+	require.Len(t, list, 16)
 
 	pathEqualsTo(t, "_testdata/anotherFile", list[0])
 	pathEqualsTo(t, "_testdata/file", list[1])
@@ -275,6 +275,8 @@ func TestReadDirRecursive(t *testing.T) {
 	pathEqualsTo(t, "_testdata/symlinktofolder/file3", list[11])
 	pathEqualsTo(t, "_testdata/symlinktofolder/subfolder", list[12])
 	pathEqualsTo(t, "_testdata/symlinktofolder/subfolder/file4", list[13])
+	pathEqualsTo(t, "_testdata/test.txt", list[14])
+	pathEqualsTo(t, "_testdata/test.txt.gz", list[15])
 }
 
 func TestFilterDirs(t *testing.T) {
@@ -282,12 +284,14 @@ func TestFilterDirs(t *testing.T) {
 
 	list, err := testPath.ReadDir()
 	require.NoError(t, err)
-	require.Len(t, list, 4)
+	require.Len(t, list, 6)
 
 	pathEqualsTo(t, "_testdata/anotherFile", list[0])
 	pathEqualsTo(t, "_testdata/file", list[1])
 	pathEqualsTo(t, "_testdata/folder", list[2])
 	pathEqualsTo(t, "_testdata/symlinktofolder", list[3])
+	pathEqualsTo(t, "_testdata/test.txt", list[4])
+	pathEqualsTo(t, "_testdata/test.txt.gz", list[5])
 
 	list.FilterDirs()
 	require.Len(t, list, 2)
@@ -300,17 +304,21 @@ func TestFilterOutDirs(t *testing.T) {
 
 	list, err := testPath.ReadDir()
 	require.NoError(t, err)
-	require.Len(t, list, 4)
+	require.Len(t, list, 6)
 
 	pathEqualsTo(t, "_testdata/anotherFile", list[0])
 	pathEqualsTo(t, "_testdata/file", list[1])
 	pathEqualsTo(t, "_testdata/folder", list[2])
 	pathEqualsTo(t, "_testdata/symlinktofolder", list[3])
+	pathEqualsTo(t, "_testdata/test.txt", list[4])
+	pathEqualsTo(t, "_testdata/test.txt.gz", list[5])
 
 	list.FilterOutDirs()
-	require.Len(t, list, 2)
+	require.Len(t, list, 4)
 	pathEqualsTo(t, "_testdata/anotherFile", list[0])
 	pathEqualsTo(t, "_testdata/file", list[1])
+	pathEqualsTo(t, "_testdata/test.txt", list[2])
+	pathEqualsTo(t, "_testdata/test.txt.gz", list[3])
 }
 
 func TestEquivalentPaths(t *testing.T) {
