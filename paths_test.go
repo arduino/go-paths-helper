@@ -348,11 +348,12 @@ func TestFilterOutDirs(t *testing.T) {
 	pathEqualsTo(t, "_testdata/test.txt.gz", list[6])
 
 	list.FilterOutDirs()
-	require.Len(t, list, 4)
+	require.Len(t, list, 5)
 	pathEqualsTo(t, "_testdata/anotherFile", list[0])
-	pathEqualsTo(t, "_testdata/file", list[1])
-	pathEqualsTo(t, "_testdata/test.txt", list[2])
-	pathEqualsTo(t, "_testdata/test.txt.gz", list[3])
+	pathEqualsTo(t, "_testdata/brokensymlink", list[1])
+	pathEqualsTo(t, "_testdata/file", list[2])
+	pathEqualsTo(t, "_testdata/test.txt", list[3])
+	pathEqualsTo(t, "_testdata/test.txt.gz", list[4])
 }
 
 func TestEquivalentPaths(t *testing.T) {
