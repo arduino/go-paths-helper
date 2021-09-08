@@ -76,6 +76,13 @@ func (p *Path) Stat() (os.FileInfo, error) {
 	return os.Stat(p.path)
 }
 
+// Lstat returns a FileInfo like stat, but when the path points to a
+// symlink, returns information about the symlink itself instead of the
+// target like Stat().
+func (p *Path) Lstat() (os.FileInfo, error) {
+	return os.Lstat(p.path)
+}
+
 // Clone create a copy of the Path object
 func (p *Path) Clone() *Path {
 	return New(p.path)
