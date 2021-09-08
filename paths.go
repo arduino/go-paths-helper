@@ -76,6 +76,13 @@ func (p *Path) Stat() (os.FileInfo, error) {
 	return os.Stat(p.path)
 }
 
+// Lstat returns a FileInfo like stat, but when the path points to a
+// symlink, returns information about the symlink itself instead of the
+// target like Stat().
+func (p *Path) Lstat() (os.FileInfo, error) {
+	return os.Lstat(p.path)
+}
+
 // Clone create a copy of the Path object
 func (p *Path) Clone() *Path {
 	return New(p.path)
@@ -334,7 +341,17 @@ func (p *Path) ReadDirRecursive() (PathList, error) {
 		paths.Add(path)
 
 		if isDir, err := path.IsDirCheck(); err != nil {
-			return nil, err
+			// Do not report not exists (broken symlink) or
+			// permission errors, since then the entry
+			// *does* exist, so let our caller figure out
+			// whether these files are relevant and this is
+			// actually a problem. We cannot ignore *all*
+			// errors, since other errors during recursion
+			// (i.e. infinite recursion due to looping
+			// symlinks) should still be returned by us.
+			if !errors.Is(err, os.ErrNotExist) && !errors.Is(err, os.ErrPermission) {
+				return nil, err
+			}
 		} else if isDir {
 			subPaths, err := path.ReadDirRecursive()
 			if err != nil {
@@ -418,22 +435,22 @@ func (p *Path) CopyDirTo(dst *Path) error {
 	}
 
 	for _, srcPath := range srcFiles {
-		srcPathInfo, err := srcPath.Stat()
+		srcPathInfo, err := srcPath.Lstat()
 		if err != nil {
 			return fmt.Errorf("getting stat info for %s: %s", srcPath, err)
-		}
-		dstPath := dst.Join(srcPath.Base())
-
-		if srcPathInfo.IsDir() {
-			if err := srcPath.CopyDirTo(dstPath); err != nil {
-				return fmt.Errorf("copying %s to %s: %s", srcPath, dstPath, err)
-			}
-			continue
 		}
 
 		// Skip symlinks.
 		if srcPathInfo.Mode()&os.ModeSymlink != 0 {
 			// TODO
+			continue
+		}
+
+		dstPath := dst.Join(srcPath.Base())
+		if srcPathInfo.IsDir() {
+			if err := srcPath.CopyDirTo(dstPath); err != nil {
+				return fmt.Errorf("copying %s to %s: %s", srcPath, dstPath, err)
+			}
 			continue
 		}
 
