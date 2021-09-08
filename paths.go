@@ -334,7 +334,17 @@ func (p *Path) ReadDirRecursive() (PathList, error) {
 		paths.Add(path)
 
 		if isDir, err := path.IsDirCheck(); err != nil {
-			return nil, err
+			// Do not report not exists (broken symlink) or
+			// permission errors, since then the entry
+			// *does* exist, so let our caller figure out
+			// whether these files are relevant and this is
+			// actually a problem. We cannot ignore *all*
+			// errors, since other errors during recursion
+			// (i.e. infinite recursion due to looping
+			// symlinks) should still be returned by us.
+			if !errors.Is(err, os.ErrNotExist) && !errors.Is(err, os.ErrPermission) {
+				return nil, err
+			}
 		} else if isDir {
 			subPaths, err := path.ReadDirRecursive()
 			if err != nil {
