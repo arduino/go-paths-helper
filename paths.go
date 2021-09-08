@@ -435,22 +435,22 @@ func (p *Path) CopyDirTo(dst *Path) error {
 	}
 
 	for _, srcPath := range srcFiles {
-		srcPathInfo, err := srcPath.Stat()
+		srcPathInfo, err := srcPath.Lstat()
 		if err != nil {
 			return fmt.Errorf("getting stat info for %s: %s", srcPath, err)
-		}
-		dstPath := dst.Join(srcPath.Base())
-
-		if srcPathInfo.IsDir() {
-			if err := srcPath.CopyDirTo(dstPath); err != nil {
-				return fmt.Errorf("copying %s to %s: %s", srcPath, dstPath, err)
-			}
-			continue
 		}
 
 		// Skip symlinks.
 		if srcPathInfo.Mode()&os.ModeSymlink != 0 {
 			// TODO
+			continue
+		}
+
+		dstPath := dst.Join(srcPath.Base())
+		if srcPathInfo.IsDir() {
+			if err := srcPath.CopyDirTo(dstPath); err != nil {
+				return fmt.Errorf("copying %s to %s: %s", srcPath, dstPath, err)
+			}
 			continue
 		}
 

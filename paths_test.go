@@ -243,6 +243,10 @@ func TestCopyDir(t *testing.T) {
 	require.False(t, isdir)
 	require.NoError(t, err)
 
+	exist, err = tmp.Join("dest", "symlinktofolder").ExistCheck()
+	require.False(t, exist)
+	require.NoError(t, err)
+
 	err = src.CopyDirTo(tmp.Join("dest"))
 	require.Error(t, err, "copying dir to already existing")
 
