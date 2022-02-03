@@ -40,7 +40,7 @@ func (p *Path) ReadDir() (PathList, error) {
 	}
 	paths := PathList{}
 	for _, info := range infos {
-		path := p.Clone().Join(info.Name())
+		path := p.Join(info.Name())
 		paths.Add(path)
 	}
 	return paths, nil
@@ -55,7 +55,7 @@ func (p *Path) ReadDirRecursive() (PathList, error) {
 	}
 	paths := PathList{}
 	for _, info := range infos {
-		path := p.Clone().Join(info.Name())
+		path := p.Join(info.Name())
 		paths.Add(path)
 
 		if isDir, err := path.IsDirCheck(); err != nil {
