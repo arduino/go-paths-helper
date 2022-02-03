@@ -29,18 +29,30 @@
 
 package paths
 
-import "io/ioutil"
+import (
+	"io/ioutil"
+)
+
+// ReadDirFilter is a filter for Path.ReadDir and Path.ReadDirRecursive methods.
+// The filter should return true to accept a file or false to reject it.
+type ReadDirFilter func(file *Path) bool
 
 // ReadDir returns a PathList containing the content of the directory
-// pointed by the current Path
-func (p *Path) ReadDir() (PathList, error) {
+// pointed by the current Path. The resulting list is filtered by the given filters chained.
+func (p *Path) ReadDir(filters ...ReadDirFilter) (PathList, error) {
 	infos, err := ioutil.ReadDir(p.path)
 	if err != nil {
 		return nil, err
 	}
 	paths := PathList{}
+fileLoop:
 	for _, info := range infos {
 		path := p.Join(info.Name())
+		for _, filter := range filters {
+			if !filter(path) {
+				continue fileLoop
+			}
+		}
 		paths.Add(path)
 	}
 	return paths, nil
