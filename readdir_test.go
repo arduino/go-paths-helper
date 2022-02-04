@@ -88,105 +88,100 @@ func TestReadDirRecursiveFiltered(t *testing.T) {
 	l, err := testdata.ReadDirRecursiveFiltered(nil)
 	require.NoError(t, err)
 	l.Sort()
-	require.Equal(t, []string{
-		"_testdata/anotherFile",
-		"_testdata/file",
-		"_testdata/folder",
-		"_testdata/folder/.hidden",
-		"_testdata/folder/file2",
-		"_testdata/folder/file3",
-		"_testdata/folder/subfolder",
-		"_testdata/folder/subfolder/file4",
-		"_testdata/symlinktofolder",
-		"_testdata/symlinktofolder/.hidden",
-		"_testdata/symlinktofolder/file2",
-		"_testdata/symlinktofolder/file3",
-		"_testdata/symlinktofolder/subfolder",
-		"_testdata/symlinktofolder/subfolder/file4",
-		"_testdata/test.txt",
-		"_testdata/test.txt.gz"}, l.AsStrings())
+	pathEqualsTo(t, "_testdata/anotherFile", l[0])
+	pathEqualsTo(t, "_testdata/file", l[1])
+	pathEqualsTo(t, "_testdata/folder", l[2])
+	pathEqualsTo(t, "_testdata/folder/.hidden", l[3])
+	pathEqualsTo(t, "_testdata/folder/file2", l[4])
+	pathEqualsTo(t, "_testdata/folder/file3", l[5])
+	pathEqualsTo(t, "_testdata/folder/subfolder", l[6])
+	pathEqualsTo(t, "_testdata/folder/subfolder/file4", l[7])
+	pathEqualsTo(t, "_testdata/symlinktofolder", l[8])
+	pathEqualsTo(t, "_testdata/symlinktofolder/.hidden", l[9])
+	pathEqualsTo(t, "_testdata/symlinktofolder/file2", l[10])
+	pathEqualsTo(t, "_testdata/symlinktofolder/file3", l[11])
+	pathEqualsTo(t, "_testdata/symlinktofolder/subfolder", l[12])
+	pathEqualsTo(t, "_testdata/symlinktofolder/subfolder/file4", l[13])
+	pathEqualsTo(t, "_testdata/test.txt", l[14])
+	pathEqualsTo(t, "_testdata/test.txt.gz", l[15])
 
 	l, err = testdata.ReadDirRecursiveFiltered(FilterOutDirectories())
 	require.NoError(t, err)
 	l.Sort()
-	require.Equal(t, []string{
-		"_testdata/anotherFile",
-		"_testdata/file",
-		"_testdata/folder", // <- this is listed but not traversed
-		// "_testdata/folder/.hidden",
-		// "_testdata/folder/file2",
-		// "_testdata/folder/file3",
-		// "_testdata/folder/subfolder",
-		// "_testdata/folder/subfolder/file4",
-		"_testdata/symlinktofolder", // <- this is listed but not traversed
-		// "_testdata/symlinktofolder/.hidden",
-		// "_testdata/symlinktofolder/file2",
-		// "_testdata/symlinktofolder/file3",
-		// "_testdata/symlinktofolder/subfolder",
-		// "_testdata/symlinktofolder/subfolder/file4",
-		"_testdata/test.txt",
-		"_testdata/test.txt.gz"}, l.AsStrings())
+	pathEqualsTo(t, "_testdata/anotherFile", l[0])
+	pathEqualsTo(t, "_testdata/file", l[1])
+	pathEqualsTo(t, "_testdata/folder", l[2]) // <- this is listed but not traversed
+	// pathEqualsTo(t,"_testdata/folder/.hidden", l[])
+	// pathEqualsTo(t,"_testdata/folder/file2", l[])
+	// pathEqualsTo(t,"_testdata/folder/file3", l[])
+	// pathEqualsTo(t,"_testdata/folder/subfolder", l[])
+	// pathEqualsTo(t,"_testdata/folder/subfolder/file4", l[])
+	pathEqualsTo(t, "_testdata/symlinktofolder", l[3]) // <- this is listed but not traversed
+	// pathEqualsTo(t,"_testdata/symlinktofolder/.hidden", l[])
+	// pathEqualsTo(t,"_testdata/symlinktofolder/file2", l[])
+	// pathEqualsTo(t,"_testdata/symlinktofolder/file3", l[])
+	// pathEqualsTo(t,"_testdata/symlinktofolder/subfolder", l[])
+	// pathEqualsTo(t,"_testdata/symlinktofolder/subfolder/file4", l[])
+	pathEqualsTo(t, "_testdata/test.txt", l[4])
+	pathEqualsTo(t, "_testdata/test.txt.gz", l[5])
 
 	l, err = testdata.ReadDirRecursiveFiltered(nil, FilterOutDirectories())
 	require.NoError(t, err)
 	l.Sort()
-	require.Equal(t, []string{
-		"_testdata/anotherFile",
-		"_testdata/file",
-		// "_testdata/folder", <- this is filtered but still traversed
-		"_testdata/folder/.hidden",
-		"_testdata/folder/file2",
-		"_testdata/folder/file3",
-		// "_testdata/folder/subfolder", <- this is filtered but still traversed
-		"_testdata/folder/subfolder/file4",
-		// "_testdata/symlinktofolder", <- this is filtered but still traversed
-		"_testdata/symlinktofolder/.hidden",
-		"_testdata/symlinktofolder/file2",
-		"_testdata/symlinktofolder/file3",
-		// "_testdata/symlinktofolder/subfolder", <- this is filtered but still traversed
-		"_testdata/symlinktofolder/subfolder/file4",
-		"_testdata/test.txt",
-		"_testdata/test.txt.gz"}, l.AsStrings())
+	pathEqualsTo(t, "_testdata/anotherFile", l[0])
+	pathEqualsTo(t, "_testdata/file", l[1])
+	// pathEqualsTo(t,"_testdata/folder", l[]) <- this is filtered but still traversed
+	pathEqualsTo(t, "_testdata/folder/.hidden", l[2])
+	pathEqualsTo(t, "_testdata/folder/file2", l[3])
+	pathEqualsTo(t, "_testdata/folder/file3", l[4])
+	// pathEqualsTo(t,"_testdata/folder/subfolder", l[]) <- this is filtered but still traversed
+	pathEqualsTo(t, "_testdata/folder/subfolder/file4", l[5])
+	// pathEqualsTo(t,"_testdata/symlinktofolder", l[]) <- this is filtered but still traversed
+	pathEqualsTo(t, "_testdata/symlinktofolder/.hidden", l[6])
+	pathEqualsTo(t, "_testdata/symlinktofolder/file2", l[7])
+	pathEqualsTo(t, "_testdata/symlinktofolder/file3", l[8])
+	// pathEqualsTo(t,"_testdata/symlinktofolder/subfolder", l[]) <- this is filtered but still traversed
+	pathEqualsTo(t, "_testdata/symlinktofolder/subfolder/file4", l[9])
+	pathEqualsTo(t, "_testdata/test.txt", l[10])
+	pathEqualsTo(t, "_testdata/test.txt.gz", l[11])
 
 	l, err = testdata.ReadDirRecursiveFiltered(FilterOutDirectories(), FilterOutDirectories())
 	require.NoError(t, err)
 	l.Sort()
-	require.Equal(t, []string{
-		"_testdata/anotherFile",
-		"_testdata/file",
-		// "_testdata/folder",
-		// "_testdata/folder/.hidden",
-		// "_testdata/folder/file2",
-		// "_testdata/folder/file3",
-		// "_testdata/folder/subfolder",
-		// "_testdata/folder/subfolder/file4",
-		// "_testdata/symlinktofolder",
-		// "_testdata/symlinktofolder/.hidden",
-		// "_testdata/symlinktofolder/file2",
-		// "_testdata/symlinktofolder/file3",
-		// "_testdata/symlinktofolder/subfolder",
-		// "_testdata/symlinktofolder/subfolder/file4",
-		"_testdata/test.txt",
-		"_testdata/test.txt.gz"}, l.AsStrings())
+	pathEqualsTo(t, "_testdata/anotherFile", l[0])
+	pathEqualsTo(t, "_testdata/file", l[1])
+	// pathEqualsTo(t,"_testdata/folder" ,l[])
+	// pathEqualsTo(t,"_testdata/folder/.hidden" ,l[])
+	// pathEqualsTo(t,"_testdata/folder/file2" ,l[])
+	// pathEqualsTo(t,"_testdata/folder/file3" ,l[])
+	// pathEqualsTo(t,"_testdata/folder/subfolder" ,l[])
+	// pathEqualsTo(t,"_testdata/folder/subfolder/file4" ,l[])
+	// pathEqualsTo(t,"_testdata/symlinktofolder" ,l[])
+	// pathEqualsTo(t,"_testdata/symlinktofolder/.hidden" ,l[])
+	// pathEqualsTo(t,"_testdata/symlinktofolder/file2" ,l[])
+	// pathEqualsTo(t,"_testdata/symlinktofolder/file3" ,l[])
+	// pathEqualsTo(t,"_testdata/symlinktofolder/subfolder" ,l[])
+	// pathEqualsTo(t,"_testdata/symlinktofolder/subfolder/file4" ,l[])
+	pathEqualsTo(t, "_testdata/test.txt", l[2])
+	pathEqualsTo(t, "_testdata/test.txt.gz", l[3])
 
 	l, err = testdata.ReadDirRecursiveFiltered(FilterOutPrefixes("sub"), FilterOutSuffixes("3"))
 	require.NoError(t, err)
 	l.Sort()
-	require.Equal(t, []string{
-		"_testdata/anotherFile",
-		"_testdata/file",
-		"_testdata/folder",
-		"_testdata/folder/.hidden",
-		"_testdata/folder/file2",
-		// "_testdata/folder/file3", <- filtered by Suffix("3")
-		"_testdata/folder/subfolder", // <- subfolder skipped by Prefix("sub")
-		// "_testdata/folder/subfolder/file4",
-		"_testdata/symlinktofolder",
-		"_testdata/symlinktofolder/.hidden",
-		"_testdata/symlinktofolder/file2",
-		// "_testdata/symlinktofolder/file3", <- filtered by Suffix("3")
-		"_testdata/symlinktofolder/subfolder", // <- subfolder skipped by Prefix("sub")
-		// "_testdata/symlinktofolder/subfolder/file4",
-		"_testdata/test.txt",
-		"_testdata/test.txt.gz"}, l.AsStrings())
+	pathEqualsTo(t, "_testdata/anotherFile", l[0])
+	pathEqualsTo(t, "_testdata/file", l[1])
+	pathEqualsTo(t, "_testdata/folder", l[2])
+	pathEqualsTo(t, "_testdata/folder/.hidden", l[3])
+	pathEqualsTo(t, "_testdata/folder/file2", l[4])
+	// pathEqualsTo(t,"_testdata/folder/file3", l[]) <- filtered by Suffix("3")
+	pathEqualsTo(t, "_testdata/folder/subfolder", l[5]) // <- subfolder skipped by Prefix("sub")
+	// pathEqualsTo(t,"_testdata/folder/subfolder/file4",l[])
+	pathEqualsTo(t, "_testdata/symlinktofolder", l[6])
+	pathEqualsTo(t, "_testdata/symlinktofolder/.hidden", l[7])
+	pathEqualsTo(t, "_testdata/symlinktofolder/file2", l[8])
+	// pathEqualsTo(t,"_testdata/symlinktofolder/file3", l[]) <- filtered by Suffix("3")
+	pathEqualsTo(t, "_testdata/symlinktofolder/subfolder", l[9]) // <- subfolder skipped by Prefix("sub")
+	// pathEqualsTo(t,"_testdata/symlinktofolder/subfolder/file4", l[])
+	pathEqualsTo(t, "_testdata/test.txt", l[10])
+	pathEqualsTo(t, "_testdata/test.txt.gz", l[11])
 }
