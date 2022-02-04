@@ -30,6 +30,7 @@
 package paths
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -278,7 +279,9 @@ func TestReadDirRecursive(t *testing.T) {
 	pathEqualsTo(t, "_testdata/symlinktofolder/subfolder/file4", list[13])
 	pathEqualsTo(t, "_testdata/test.txt", list[14])
 	pathEqualsTo(t, "_testdata/test.txt.gz", list[15])
+}
 
+func TestReadDirRecursiveSymLinkLoop(t *testing.T) {
 	// Test symlink loop
 	tmp, err := MkTempDir("", "")
 	require.NoError(t, err)
@@ -290,6 +293,7 @@ func TestReadDirRecursive(t *testing.T) {
 
 	l, err := tmp.ReadDirRecursive()
 	require.Error(t, err)
+	fmt.Println(err)
 	require.Nil(t, l)
 }
 
