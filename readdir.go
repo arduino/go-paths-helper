@@ -83,3 +83,38 @@ func (p *Path) ReadDirRecursive() (PathList, error) {
 	}
 	return paths, nil
 }
+
+// FilterDirectories is a ReadDirFilter that accepts only directories
+func FilterDirectories() ReadDirFilter {
+	return func(path *Path) bool {
+		return path.IsDir()
+	}
+}
+
+// FilterOutDirectories is a ReadDirFilter that rejects all directories
+func FilterOutDirectories() ReadDirFilter {
+	return func(path *Path) bool {
+		return !path.IsDir()
+	}
+}
+
+// OrFilter creates a ReadDirFilter that accepts all items that are accepted by x or by y
+func OrFilter(x, y ReadDirFilter) ReadDirFilter {
+	return func(path *Path) bool {
+		return x(path) || y(path)
+	}
+}
+
+// AndFilter creates a ReadDirFilter that accepts all items that are accepted by both x and y
+func AndFilter(x, y ReadDirFilter) ReadDirFilter {
+	return func(path *Path) bool {
+		return x(path) && y(path)
+	}
+}
+
+// NotFilter creates a ReadDifFilter that accepts all items rejected by x and viceversa
+func NotFilter(x ReadDirFilter) ReadDirFilter {
+	return func(path *Path) bool {
+		return !x(path)
+	}
+}
