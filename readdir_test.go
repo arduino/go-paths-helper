@@ -76,4 +76,96 @@ func TestReadDirRecursiveSymLinkLoop(t *testing.T) {
 	require.Error(t, err)
 	fmt.Println(err)
 	require.Nil(t, l)
+
+	l, err = tmp.ReadDirRecursiveFiltered(nil)
+	require.Error(t, err)
+	fmt.Println(err)
+	require.Nil(t, l)
+}
+
+func TestReadDirRecursiveFiltered(t *testing.T) {
+	testdata := New("_testdata")
+	l, err := testdata.ReadDirRecursiveFiltered(nil)
+	require.NoError(t, err)
+	l.Sort()
+	require.Equal(t, []string{
+		"_testdata/anotherFile",
+		"_testdata/file",
+		"_testdata/folder",
+		"_testdata/folder/.hidden",
+		"_testdata/folder/file2",
+		"_testdata/folder/file3",
+		"_testdata/folder/subfolder",
+		"_testdata/folder/subfolder/file4",
+		"_testdata/symlinktofolder",
+		"_testdata/symlinktofolder/.hidden",
+		"_testdata/symlinktofolder/file2",
+		"_testdata/symlinktofolder/file3",
+		"_testdata/symlinktofolder/subfolder",
+		"_testdata/symlinktofolder/subfolder/file4",
+		"_testdata/test.txt",
+		"_testdata/test.txt.gz"}, l.AsStrings())
+
+	l, err = testdata.ReadDirRecursiveFiltered(FilterOutDirectories())
+	require.NoError(t, err)
+	l.Sort()
+	require.Equal(t, []string{
+		"_testdata/anotherFile",
+		"_testdata/file",
+		"_testdata/folder", // <- this is listed but not traversed
+		// "_testdata/folder/.hidden",
+		// "_testdata/folder/file2",
+		// "_testdata/folder/file3",
+		// "_testdata/folder/subfolder",
+		// "_testdata/folder/subfolder/file4",
+		"_testdata/symlinktofolder", // <- this is listed but not traversed
+		// "_testdata/symlinktofolder/.hidden",
+		// "_testdata/symlinktofolder/file2",
+		// "_testdata/symlinktofolder/file3",
+		// "_testdata/symlinktofolder/subfolder",
+		// "_testdata/symlinktofolder/subfolder/file4",
+		"_testdata/test.txt",
+		"_testdata/test.txt.gz"}, l.AsStrings())
+
+	l, err = testdata.ReadDirRecursiveFiltered(nil, FilterOutDirectories())
+	require.NoError(t, err)
+	l.Sort()
+	require.Equal(t, []string{
+		"_testdata/anotherFile",
+		"_testdata/file",
+		// "_testdata/folder", <- this is filtered but still traversed
+		"_testdata/folder/.hidden",
+		"_testdata/folder/file2",
+		"_testdata/folder/file3",
+		// "_testdata/folder/subfolder", <- this is filtered but still traversed
+		"_testdata/folder/subfolder/file4",
+		// "_testdata/symlinktofolder", <- this is filtered but still traversed
+		"_testdata/symlinktofolder/.hidden",
+		"_testdata/symlinktofolder/file2",
+		"_testdata/symlinktofolder/file3",
+		// "_testdata/symlinktofolder/subfolder", <- this is filtered but still traversed
+		"_testdata/symlinktofolder/subfolder/file4",
+		"_testdata/test.txt",
+		"_testdata/test.txt.gz"}, l.AsStrings())
+
+	l, err = testdata.ReadDirRecursiveFiltered(FilterOutDirectories(), FilterOutDirectories())
+	require.NoError(t, err)
+	l.Sort()
+	require.Equal(t, []string{
+		"_testdata/anotherFile",
+		"_testdata/file",
+		// "_testdata/folder",
+		// "_testdata/folder/.hidden",
+		// "_testdata/folder/file2",
+		// "_testdata/folder/file3",
+		// "_testdata/folder/subfolder",
+		// "_testdata/folder/subfolder/file4",
+		// "_testdata/symlinktofolder",
+		// "_testdata/symlinktofolder/.hidden",
+		// "_testdata/symlinktofolder/file2",
+		// "_testdata/symlinktofolder/file3",
+		// "_testdata/symlinktofolder/subfolder",
+		// "_testdata/symlinktofolder/subfolder/file4",
+		"_testdata/test.txt",
+		"_testdata/test.txt.gz"}, l.AsStrings())
 }
