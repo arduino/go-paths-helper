@@ -30,8 +30,6 @@
 package paths
 
 import (
-	"fmt"
-	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -254,47 +252,6 @@ func TestParents(t *testing.T) {
 	pathEqualsTo(t, "a/very", parents2[2])
 	pathEqualsTo(t, "a", parents2[3])
 	pathEqualsTo(t, ".", parents2[4])
-}
-
-func TestReadDirRecursive(t *testing.T) {
-	testPath := New("_testdata")
-
-	list, err := testPath.ReadDirRecursive()
-	require.NoError(t, err)
-	require.Len(t, list, 16)
-
-	pathEqualsTo(t, "_testdata/anotherFile", list[0])
-	pathEqualsTo(t, "_testdata/file", list[1])
-	pathEqualsTo(t, "_testdata/folder", list[2])
-	pathEqualsTo(t, "_testdata/folder/.hidden", list[3])
-	pathEqualsTo(t, "_testdata/folder/file2", list[4])
-	pathEqualsTo(t, "_testdata/folder/file3", list[5])
-	pathEqualsTo(t, "_testdata/folder/subfolder", list[6])
-	pathEqualsTo(t, "_testdata/folder/subfolder/file4", list[7])
-	pathEqualsTo(t, "_testdata/symlinktofolder", list[8])
-	pathEqualsTo(t, "_testdata/symlinktofolder/.hidden", list[9])
-	pathEqualsTo(t, "_testdata/symlinktofolder/file2", list[10])
-	pathEqualsTo(t, "_testdata/symlinktofolder/file3", list[11])
-	pathEqualsTo(t, "_testdata/symlinktofolder/subfolder", list[12])
-	pathEqualsTo(t, "_testdata/symlinktofolder/subfolder/file4", list[13])
-	pathEqualsTo(t, "_testdata/test.txt", list[14])
-	pathEqualsTo(t, "_testdata/test.txt.gz", list[15])
-}
-
-func TestReadDirRecursiveSymLinkLoop(t *testing.T) {
-	// Test symlink loop
-	tmp, err := MkTempDir("", "")
-	require.NoError(t, err)
-	defer tmp.RemoveAll()
-
-	folder := tmp.Join("folder")
-	err = os.Symlink(tmp.String(), folder.String())
-	require.NoError(t, err)
-
-	l, err := tmp.ReadDirRecursive()
-	require.Error(t, err)
-	fmt.Println(err)
-	require.Nil(t, l)
 }
 
 func TestFilterDirs(t *testing.T) {
