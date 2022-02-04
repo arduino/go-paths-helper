@@ -168,4 +168,25 @@ func TestReadDirRecursiveFiltered(t *testing.T) {
 		// "_testdata/symlinktofolder/subfolder/file4",
 		"_testdata/test.txt",
 		"_testdata/test.txt.gz"}, l.AsStrings())
+
+	l, err = testdata.ReadDirRecursiveFiltered(FilterOutPrefixes("sub"), FilterOutSuffixes("3"))
+	require.NoError(t, err)
+	l.Sort()
+	require.Equal(t, []string{
+		"_testdata/anotherFile",
+		"_testdata/file",
+		"_testdata/folder",
+		"_testdata/folder/.hidden",
+		"_testdata/folder/file2",
+		// "_testdata/folder/file3", <- filtered by Suffix("3")
+		"_testdata/folder/subfolder", // <- subfolder skipped by Prefix("sub")
+		// "_testdata/folder/subfolder/file4",
+		"_testdata/symlinktofolder",
+		"_testdata/symlinktofolder/.hidden",
+		"_testdata/symlinktofolder/file2",
+		// "_testdata/symlinktofolder/file3", <- filtered by Suffix("3")
+		"_testdata/symlinktofolder/subfolder", // <- subfolder skipped by Prefix("sub")
+		// "_testdata/symlinktofolder/subfolder/file4",
+		"_testdata/test.txt",
+		"_testdata/test.txt.gz"}, l.AsStrings())
 }

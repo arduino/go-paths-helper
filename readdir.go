@@ -31,6 +31,7 @@ package paths
 
 import (
 	"io/ioutil"
+	"strings"
 )
 
 // ReadDirFilter is a filter for Path.ReadDir and Path.ReadDirRecursive methods.
@@ -138,6 +139,60 @@ func FilterDirectories() ReadDirFilter {
 func FilterOutDirectories() ReadDirFilter {
 	return func(path *Path) bool {
 		return !path.IsDir()
+	}
+}
+
+// FilterSuffixes creates a ReadDirFilter that accepts only the given
+// filename suffixes
+func FilterSuffixes(allowedSuffixes ...string) ReadDirFilter {
+	return func(file *Path) bool {
+		for _, suffix := range allowedSuffixes {
+			if strings.HasSuffix(file.String(), suffix) {
+				return true
+			}
+		}
+		return false
+	}
+}
+
+// FilterOutSuffixes creates a ReadDirFilter that rejects all the given
+// filename suffixes
+func FilterOutSuffixes(rejectedSuffixes ...string) ReadDirFilter {
+	return func(file *Path) bool {
+		for _, suffix := range rejectedSuffixes {
+			if strings.HasSuffix(file.String(), suffix) {
+				return false
+			}
+		}
+		return true
+	}
+}
+
+// FilterPrefixes creates a ReadDirFilter that accepts only the given
+// filename prefixes
+func FilterPrefixes(allowedPrefixes ...string) ReadDirFilter {
+	return func(file *Path) bool {
+		name := file.Base()
+		for _, prefix := range allowedPrefixes {
+			if strings.HasPrefix(name, prefix) {
+				return true
+			}
+		}
+		return false
+	}
+}
+
+// FilterOutPrefixes creates a ReadDirFilter that rejects all the given
+// filename prefixes
+func FilterOutPrefixes(rejectedPrefixes ...string) ReadDirFilter {
+	return func(file *Path) bool {
+		name := file.Base()
+		for _, prefix := range rejectedPrefixes {
+			if strings.HasPrefix(name, prefix) {
+				return false
+			}
+		}
+		return true
 	}
 }
 
