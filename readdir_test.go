@@ -83,6 +83,33 @@ func TestReadDirRecursiveSymLinkLoop(t *testing.T) {
 	require.Nil(t, l)
 }
 
+func TestReadDirFiltered(t *testing.T) {
+	folderPath := New("_testdata/folder")
+	list, err := folderPath.ReadDir()
+	require.NoError(t, err)
+	require.Len(t, list, 4)
+	pathEqualsTo(t, "_testdata/folder/.hidden", list[0])
+	pathEqualsTo(t, "_testdata/folder/file2", list[1])
+	pathEqualsTo(t, "_testdata/folder/file3", list[2])
+	pathEqualsTo(t, "_testdata/folder/subfolder", list[3])
+
+	list, err = folderPath.ReadDir(FilterDirectories())
+	require.NoError(t, err)
+	require.Len(t, list, 1)
+	// pathEqualsTo(t, "_testdata/folder/.hidden", list[])
+	// pathEqualsTo(t, "_testdata/folder/file2", list[])
+	// pathEqualsTo(t, "_testdata/folder/file3", list[])
+	pathEqualsTo(t, "_testdata/folder/subfolder", list[0])
+
+	list, err = folderPath.ReadDir(FilterOutPrefixes("file"))
+	require.NoError(t, err)
+	require.Len(t, list, 2)
+	pathEqualsTo(t, "_testdata/folder/.hidden", list[0])
+	// pathEqualsTo(t, "_testdata/folder/file2", list[])
+	// pathEqualsTo(t, "_testdata/folder/file3", list[])
+	pathEqualsTo(t, "_testdata/folder/subfolder", list[1])
+}
+
 func TestReadDirRecursiveFiltered(t *testing.T) {
 	testdata := New("_testdata")
 	l, err := testdata.ReadDirRecursiveFiltered(nil)
