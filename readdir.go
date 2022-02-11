@@ -45,14 +45,21 @@ func (p *Path) ReadDir(filters ...ReadDirFilter) (PathList, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	accept := func(p *Path) bool {
+		for _, filter := range filters {
+			if !filter(p) {
+				return false
+			}
+		}
+		return true
+	}
+
 	paths := PathList{}
-fileLoop:
 	for _, info := range infos {
 		path := p.Join(info.Name())
-		for _, filter := range filters {
-			if !filter(path) {
-				continue fileLoop
-			}
+		if !accept(path) {
+			continue
 		}
 		paths.Add(path)
 	}
@@ -98,18 +105,21 @@ func (p *Path) ReadDirRecursiveFiltered(recursionFilter ReadDirFilter, filters .
 	if err != nil {
 		return nil, err
 	}
+
+	accept := func(p *Path) bool {
+		for _, filter := range filters {
+			if !filter(p) {
+				return false
+			}
+		}
+		return true
+	}
+
 	paths := PathList{}
 	for _, info := range infos {
 		path := p.Join(info.Name())
 
-		accept := true
-		for _, filter := range filters {
-			if !filter(path) {
-				accept = false
-				break
-			}
-		}
-		if accept {
+		if accept(path) {
 			paths.Add(path)
 		}
 
