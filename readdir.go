@@ -206,17 +206,29 @@ func FilterOutPrefixes(rejectedPrefixes ...string) ReadDirFilter {
 	}
 }
 
-// OrFilter creates a ReadDirFilter that accepts all items that are accepted by x or by y
-func OrFilter(x, y ReadDirFilter) ReadDirFilter {
+// OrFilter creates a ReadDirFilter that accepts all items that are accepted
+// by any (at least one) of the given filters
+func OrFilter(filters ...ReadDirFilter) ReadDirFilter {
 	return func(path *Path) bool {
-		return x(path) || y(path)
+		for _, f := range filters {
+			if f(path) {
+				return true
+			}
+		}
+		return false
 	}
 }
 
-// AndFilter creates a ReadDirFilter that accepts all items that are accepted by both x and y
-func AndFilter(x, y ReadDirFilter) ReadDirFilter {
+// AndFilter creates a ReadDirFilter that accepts all items that are accepted
+// by all the given filters
+func AndFilter(filters ...ReadDirFilter) ReadDirFilter {
 	return func(path *Path) bool {
-		return x(path) && y(path)
+		for _, f := range filters {
+			if !f(path) {
+				return false
+			}
+		}
+		return true
 	}
 }
 
