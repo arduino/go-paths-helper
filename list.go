@@ -140,9 +140,7 @@ func (p *PathList) Add(path *Path) {
 
 // AddAll adds all Paths in the list passed as argument
 func (p *PathList) AddAll(paths PathList) {
-	for _, path := range paths {
-		*p = append(*p, path)
-	}
+	*p = append(*p, paths...)
 }
 
 // AddIfMissing adds a Path to the PathList if the path is not already
