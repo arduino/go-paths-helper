@@ -152,6 +152,30 @@ func FilterOutDirectories() ReadDirFilter {
 	}
 }
 
+// FilterNames is a ReadDirFilter that accepts only the given filenames
+func FilterNames(allowedNames ...string) ReadDirFilter {
+	return func(file *Path) bool {
+		for _, name := range allowedNames {
+			if file.Base() == name {
+				return true
+			}
+		}
+		return false
+	}
+}
+
+// FilterOutNames is a ReadDirFilter that rejects the given filenames
+func FilterOutNames(rejectedNames ...string) ReadDirFilter {
+	return func(file *Path) bool {
+		for _, name := range rejectedNames {
+			if file.Base() == name {
+				return false
+			}
+		}
+		return true
+	}
+}
+
 // FilterSuffixes creates a ReadDirFilter that accepts only the given
 // filename suffixes
 func FilterSuffixes(allowedSuffixes ...string) ReadDirFilter {
