@@ -95,11 +95,11 @@ func (p *Path) ReadDirRecursive() (PathList, error) {
 // ReadDirRecursiveFiltered returns a PathList containing the content of the directory
 // and its subdirectories pointed by the current Path, filtered by the given skipFilter
 // and filters:
-// - `recursionFilter` is a filter that is checked to determine if the subdirectory must
-//   by visited recursively (if the filter rejects the entry, the entry is not visited
-//   but can still be added to the result)
-// - `filters` are the filters that are checked to determine if the entry should be
-//   added to the resulting PathList
+//   - `recursionFilter` is a filter that is checked to determine if the subdirectory must
+//     by visited recursively (if the filter rejects the entry, the entry is not visited
+//     but can still be added to the result)
+//   - `filters` are the filters that are checked to determine if the entry should be
+//     added to the resulting PathList
 func (p *Path) ReadDirRecursiveFiltered(recursionFilter ReadDirFilter, filters ...ReadDirFilter) (PathList, error) {
 	infos, err := ioutil.ReadDir(p.path)
 	if err != nil {
