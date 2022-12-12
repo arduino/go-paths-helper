@@ -101,7 +101,7 @@ func (p *PathList) filter(filter func(*Path) bool) {
 	*p = res
 }
 
-// FilterOutPrefix remove all entries having the specified prefixes
+// FilterOutPrefix remove all entries having one of the specified prefixes
 func (p *PathList) FilterOutPrefix(prefixes ...string) {
 	filterFunction := func(path *Path) bool {
 		return !path.HasPrefix(prefixes...)
@@ -117,7 +117,7 @@ func (p *PathList) FilterPrefix(prefixes ...string) {
 	p.filter(filterFunction)
 }
 
-// FilterOutSuffix remove all entries having the specified suffix
+// FilterOutSuffix remove all entries having one of the specified suffixes
 func (p *PathList) FilterOutSuffix(suffixies ...string) {
 	filterFunction := func(path *Path) bool {
 		return !path.HasSuffix(suffixies...)
@@ -125,7 +125,7 @@ func (p *PathList) FilterOutSuffix(suffixies ...string) {
 	p.filter(filterFunction)
 }
 
-// FilterSuffix remove all entries not having the specified prefix
+// FilterSuffix remove all entries not having one of the specified suffixes
 func (p *PathList) FilterSuffix(suffixies ...string) {
 	filterFunction := func(path *Path) bool {
 		return path.HasSuffix(suffixies...)
