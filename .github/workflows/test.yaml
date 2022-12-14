@@ -13,7 +13,6 @@ jobs:
             ubuntu-latest,
             ubuntu-18.04,
             windows-latest,
-            windows-2016,
             macos-latest,
           ]
 
