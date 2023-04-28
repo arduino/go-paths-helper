@@ -188,12 +188,17 @@ func (p *Path) Clean() *Path {
 
 // IsInsideDir returns true if the current path is inside the provided
 // dir
-func (p *Path) IsInsideDir(dir *Path) (bool, error) {
+func (p *Path) IsInsideDir(dir *Path) bool {
 	rel, err := filepath.Rel(dir.path, p.path)
 	if err != nil {
-		return false, err
+		// If the dir cannot be made relative to this path it means
+		// that it belong to a different filesystems, so it cannot be
+		// inside this path.
+		return false
 	}
-	return !strings.Contains(rel, ".."+string(os.PathSeparator)) && rel != ".." && rel != ".", nil
+	return !strings.Contains(rel, ".."+string(os.PathSeparator)) &&
+		rel != ".." &&
+		rel != "."
 }
 
 // Parent returns all but the last element of path, typically the path's
