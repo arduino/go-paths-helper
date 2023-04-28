@@ -191,7 +191,10 @@ func (p *Path) Clean() *Path {
 func (p *Path) IsInsideDir(dir *Path) (bool, error) {
 	rel, err := filepath.Rel(dir.path, p.path)
 	if err != nil {
-		return false, err
+		// If the dir cannot be made relative to this path it means
+		// that it belong to a different filesystems, so it cannot be
+		// inside this path.
+		return false, nil
 	}
 	return !strings.Contains(rel, ".."+string(os.PathSeparator)) && rel != ".." && rel != ".", nil
 }

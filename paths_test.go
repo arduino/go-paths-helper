@@ -154,16 +154,17 @@ func TestResetStatCacheWhenFollowingSymlink(t *testing.T) {
 }
 
 func TestIsInsideDir(t *testing.T) {
-	inside := func(a, b *Path) {
-		in, err := a.IsInsideDir(b)
-		require.NoError(t, err)
-		require.True(t, in, "%s is inside %s", a, b)
-	}
-
 	notInside := func(a, b *Path) {
 		in, err := a.IsInsideDir(b)
 		require.NoError(t, err)
 		require.False(t, in, "%s is inside %s", a, b)
+	}
+
+	inside := func(a, b *Path) {
+		in, err := a.IsInsideDir(b)
+		require.NoError(t, err)
+		require.True(t, in, "%s is inside %s", a, b)
+		notInside(b, a)
 	}
 
 	f1 := New("/a/b/c")
@@ -196,6 +197,14 @@ func TestIsInsideDir(t *testing.T) {
 	f5 := New("/home/megabug/a15/packages")
 	notInside(f5, f4)
 	notInside(f4, f5)
+
+	if runtime.GOOS == "windows" {
+		f6 := New("C:\\", "A")
+		f7 := New("C:\\", "A", "B", "C")
+		f8 := New("E:\\", "A", "B", "C")
+		inside(f7, f6)
+		notInside(f8, f6)
+	}
 }
 
 func TestReadFileAsLines(t *testing.T) {
