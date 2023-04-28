@@ -155,15 +155,11 @@ func TestResetStatCacheWhenFollowingSymlink(t *testing.T) {
 
 func TestIsInsideDir(t *testing.T) {
 	notInside := func(a, b *Path) {
-		in, err := a.IsInsideDir(b)
-		require.NoError(t, err)
-		require.False(t, in, "%s is inside %s", a, b)
+		require.False(t, a.IsInsideDir(b), "%s is inside %s", a, b)
 	}
 
 	inside := func(a, b *Path) {
-		in, err := a.IsInsideDir(b)
-		require.NoError(t, err)
-		require.True(t, in, "%s is inside %s", a, b)
+		require.True(t, a.IsInsideDir(b), "%s is inside %s", a, b)
 		notInside(b, a)
 	}
 
@@ -381,9 +377,7 @@ func TestWriteToTempFile(t *testing.T) {
 	defer tmp.Remove()
 	require.NoError(t, err)
 	require.True(t, strings.HasPrefix(tmp.Base(), "prefix"))
-	inside, err := tmp.IsInsideDir(tmpDir)
-	require.NoError(t, err)
-	require.True(t, inside)
+	require.True(t, tmp.IsInsideDir(tmpDir))
 	data, err := tmp.ReadFile()
 	require.NoError(t, err)
 	require.Equal(t, tmpData, data)
