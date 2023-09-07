@@ -306,19 +306,21 @@ func TestFilterDirs(t *testing.T) {
 
 	list, err := testPath.ReadDir()
 	require.NoError(t, err)
-	require.Len(t, list, 6)
+	require.Len(t, list, 7)
 
 	pathEqualsTo(t, "_testdata/anotherFile", list[0])
 	pathEqualsTo(t, "_testdata/file", list[1])
 	pathEqualsTo(t, "_testdata/folder", list[2])
-	pathEqualsTo(t, "_testdata/symlinktofolder", list[3])
-	pathEqualsTo(t, "_testdata/test.txt", list[4])
-	pathEqualsTo(t, "_testdata/test.txt.gz", list[5])
+	pathEqualsTo(t, "_testdata/folder_containing_symlinks", list[3])
+	pathEqualsTo(t, "_testdata/symlinktofolder", list[4])
+	pathEqualsTo(t, "_testdata/test.txt", list[5])
+	pathEqualsTo(t, "_testdata/test.txt.gz", list[6])
 
 	list.FilterDirs()
-	require.Len(t, list, 2)
+	require.Len(t, list, 3)
 	pathEqualsTo(t, "_testdata/folder", list[0])
-	pathEqualsTo(t, "_testdata/symlinktofolder", list[1])
+	pathEqualsTo(t, "_testdata/folder_containing_symlinks", list[1])
+	pathEqualsTo(t, "_testdata/symlinktofolder", list[2])
 }
 
 func TestFilterOutDirs(t *testing.T) {
@@ -326,14 +328,15 @@ func TestFilterOutDirs(t *testing.T) {
 
 	list, err := testPath.ReadDir()
 	require.NoError(t, err)
-	require.Len(t, list, 6)
+	require.Len(t, list, 7)
 
 	pathEqualsTo(t, "_testdata/anotherFile", list[0])
 	pathEqualsTo(t, "_testdata/file", list[1])
 	pathEqualsTo(t, "_testdata/folder", list[2])
-	pathEqualsTo(t, "_testdata/symlinktofolder", list[3])
-	pathEqualsTo(t, "_testdata/test.txt", list[4])
-	pathEqualsTo(t, "_testdata/test.txt.gz", list[5])
+	pathEqualsTo(t, "_testdata/folder_containing_symlinks", list[3])
+	pathEqualsTo(t, "_testdata/symlinktofolder", list[4])
+	pathEqualsTo(t, "_testdata/test.txt", list[5])
+	pathEqualsTo(t, "_testdata/test.txt.gz", list[6])
 
 	list.FilterOutDirs()
 	require.Len(t, list, 4)
