@@ -275,7 +275,9 @@ func TestCopyDir(t *testing.T) {
 		exist, err = tmp.Join("broken_dest", "broken_symlink").ExistCheck()
 		require.False(t, exist)
 		require.Error(t, err)
-		require.Contains(t, err.Error(), "too many levels of symbolic links")
+		if runtime.GOOS != "windows" {
+			require.Contains(t, err.Error(), "too many levels of symbolic links")
+		}
 
 		exist, err = tmp.Join("broken_dest", "symlink").ExistCheck()
 		require.False(t, exist)
