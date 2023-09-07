@@ -30,6 +30,7 @@
 package paths
 
 import (
+	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -243,6 +244,43 @@ func TestCopyDir(t *testing.T) {
 
 	err = src.Join("file").CopyDirTo(tmp.Join("dest2"))
 	require.Error(t, err, "copying file as dir")
+
+	// Check if the file is a symlink
+	isSymlink, err := tmp.Join("dest", "folder_containing_symlinks", "file").IsSymlink()
+	require.True(t, isSymlink)
+	require.NoError(t, err)
+
+	// Check if the folder is a symlink
+	isSymlink, err = tmp.Join("dest", "folder_containing_symlinks", "folder").IsSymlink()
+	require.True(t, isSymlink)
+	require.NoError(t, err)
+
+	// Broken symlink is copied
+	{
+		// create broken folder containing the broken symlink file
+		tmpDestFolder := New(tmp.Join("broken").String())
+		require.NoError(t, tmpDestFolder.Mkdir())
+
+		// Create a symlink that will raise a too many levels of symblic links error
+		err = os.Symlink("broken_symlink", tmpDestFolder.Join("broken_symlink").String())
+		require.NoError(t, err)
+		// Create a symlinking pointing to a not existing file
+		err = os.Symlink("symlink", tmpDestFolder.Join("broken").String())
+		require.NoError(t, err)
+
+		src := tmpDestFolder
+		err = src.CopyDirTo(tmp.Join("broken_dest"))
+		require.NoError(t, err)
+
+		exist, err = tmp.Join("broken_dest", "broken_symlink").ExistCheck()
+		require.False(t, exist)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "too many levels of symbolic links")
+
+		exist, err = tmp.Join("broken_dest", "symlink").ExistCheck()
+		require.False(t, exist)
+		require.NoError(t, err)
+	}
 }
 
 func TestParents(t *testing.T) {

@@ -76,6 +76,13 @@ func (p *Path) Stat() (os.FileInfo, error) {
 	return os.Stat(p.path)
 }
 
+// Lstat returns a FileInfo describing the named file.
+// If the file is a symbolic link, the returned FileInfo
+// describes the symbolic link. Lstat makes no attempt to follow the link.
+func (p *Path) Lstat() (os.FileInfo, error) {
+	return os.Lstat(p.path)
+}
+
 // Clone create a copy of the Path object
 func (p *Path) Clone() *Path {
 	return New(p.path)
@@ -311,6 +318,16 @@ func (p *Path) IsDirCheck() (bool, error) {
 	return false, err
 }
 
+// IsDirCheck return true if the path exists and is a symlink. In all the other
+// cases (and also in case of any error) false is returned.
+func (p *Path) IsSymlink() (bool, error) {
+	info, err := p.Lstat()
+	if err != nil {
+		return false, fmt.Errorf("getting lstat info for %s: %s", p.path, err)
+	}
+	return info.Mode()&os.ModeSymlink != 0, nil
+}
+
 // CopyTo copies the contents of the file named src to the file named
 // by dst. The file will be created if it does not already exist. If the
 // destination file exists, all it's contents will be replaced by the contents
@@ -382,22 +399,30 @@ func (p *Path) CopyDirTo(dst *Path) error {
 	}
 
 	for _, srcPath := range srcFiles {
-		srcPathInfo, err := srcPath.Stat()
+		srcPathInfo, err := srcPath.Lstat()
 		if err != nil {
-			return fmt.Errorf("getting stat info for %s: %s", srcPath, err)
+			return fmt.Errorf("getting lstat info for %s: %s", srcPath, err)
 		}
 		dstPath := dst.Join(srcPath.Base())
+
+		// In case is a symlink, copy the symlink
+		if srcPathInfo.Mode()&os.ModeSymlink != 0 {
+			namedLink, err := os.Readlink(srcPath.path)
+			if err != nil {
+				return fmt.Errorf("could not read symlink: %s", err.Error())
+			}
+
+			if err := os.Symlink(namedLink, dstPath.path); err != nil {
+				return fmt.Errorf("creating symlink (%s) of %s to %s: %s", namedLink, srcPath, dstPath, err)
+			}
+
+			continue
+		}
 
 		if srcPathInfo.IsDir() {
 			if err := srcPath.CopyDirTo(dstPath); err != nil {
 				return fmt.Errorf("copying %s to %s: %s", srcPath, dstPath, err)
 			}
-			continue
-		}
-
-		// Skip symlinks.
-		if srcPathInfo.Mode()&os.ModeSymlink != 0 {
-			// TODO
 			continue
 		}
 
