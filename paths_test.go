@@ -388,3 +388,21 @@ func TestWriteToTempFile(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, tmpData, data)
 }
+
+func TestCopyToSamePath(t *testing.T) {
+	tmpDir := New(t.TempDir())
+	srcFile := tmpDir.Join("test_file")
+	dstFile := srcFile
+
+	// create the source file in tmp dir
+	err := srcFile.WriteFile([]byte("hello"))
+	require.NoError(t, err)
+	content, err := srcFile.ReadFile()
+	require.NoError(t, err)
+	require.Equal(t, []byte("hello"), content)
+
+	// cannot copy the same file
+	err = srcFile.CopyTo(dstFile)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "are the same file")
+}

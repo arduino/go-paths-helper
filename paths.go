@@ -317,6 +317,10 @@ func (p *Path) IsDirCheck() (bool, error) {
 // of the source file. The file mode will be copied from the source and
 // the copied data is synced/flushed to stable storage.
 func (p *Path) CopyTo(dst *Path) error {
+	if p.EqualsTo(dst) {
+		return fmt.Errorf("%s and %s are the same file", p.path, dst.path)
+	}
+
 	in, err := os.Open(p.path)
 	if err != nil {
 		return err
