@@ -36,8 +36,8 @@ import (
 )
 
 func TestGzipGunzip(t *testing.T) {
-	zipped := New("testdata", "test.txt.gz")
-	unzipped := New("testdata", "test.txt")
+	zipped := New("testdata", "fileset", "test.txt.gz")
+	unzipped := New("testdata", "fileset", "test.txt")
 
 	tmp, err := MkTempDir("", "")
 	require.NoError(t, err)

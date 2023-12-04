@@ -57,8 +57,8 @@ func TestPathNew(t *testing.T) {
 }
 
 func TestPath(t *testing.T) {
-	testPath := New("testdata")
-	pathEqualsTo(t, "testdata", testPath)
+	testPath := New("testdata", "fileset")
+	pathEqualsTo(t, "testdata/fileset", testPath)
 	isDir, err := testPath.IsDirCheck()
 	require.True(t, isDir)
 	require.NoError(t, err)
@@ -71,7 +71,7 @@ func TestPath(t *testing.T) {
 	require.False(t, testPath.NotExist())
 
 	folderPath := testPath.Join("folder")
-	pathEqualsTo(t, "testdata/folder", folderPath)
+	pathEqualsTo(t, "testdata/fileset/folder", folderPath)
 	isDir, err = folderPath.IsDirCheck()
 	require.True(t, isDir)
 	require.NoError(t, err)
@@ -85,7 +85,7 @@ func TestPath(t *testing.T) {
 	require.False(t, folderPath.NotExist())
 
 	filePath := testPath.Join("file")
-	pathEqualsTo(t, "testdata/file", filePath)
+	pathEqualsTo(t, "testdata/fileset/file", filePath)
 	isDir, err = filePath.IsDirCheck()
 	require.False(t, isDir)
 	require.NoError(t, err)
@@ -98,7 +98,7 @@ func TestPath(t *testing.T) {
 	require.False(t, filePath.NotExist())
 
 	anotherFilePath := filePath.Join("notexistent")
-	pathEqualsTo(t, "testdata/file/notexistent", anotherFilePath)
+	pathEqualsTo(t, "testdata/fileset/file/notexistent", anotherFilePath)
 	isDir, err = anotherFilePath.IsDirCheck()
 	require.False(t, isDir)
 	require.Error(t, err)
@@ -113,32 +113,32 @@ func TestPath(t *testing.T) {
 	list, err := folderPath.ReadDir()
 	require.NoError(t, err)
 	require.Len(t, list, 4)
-	pathEqualsTo(t, "testdata/folder/.hidden", list[0])
-	pathEqualsTo(t, "testdata/folder/file2", list[1])
-	pathEqualsTo(t, "testdata/folder/file3", list[2])
-	pathEqualsTo(t, "testdata/folder/subfolder", list[3])
+	pathEqualsTo(t, "testdata/fileset/folder/.hidden", list[0])
+	pathEqualsTo(t, "testdata/fileset/folder/file2", list[1])
+	pathEqualsTo(t, "testdata/fileset/folder/file3", list[2])
+	pathEqualsTo(t, "testdata/fileset/folder/subfolder", list[3])
 
 	list2 := list.Clone()
 	list2.FilterDirs()
 	require.Len(t, list2, 1)
-	pathEqualsTo(t, "testdata/folder/subfolder", list2[0])
+	pathEqualsTo(t, "testdata/fileset/folder/subfolder", list2[0])
 
 	list2 = list.Clone()
 	list2.FilterOutHiddenFiles()
 	require.Len(t, list2, 3)
-	pathEqualsTo(t, "testdata/folder/file2", list2[0])
-	pathEqualsTo(t, "testdata/folder/file3", list2[1])
-	pathEqualsTo(t, "testdata/folder/subfolder", list2[2])
+	pathEqualsTo(t, "testdata/fileset/folder/file2", list2[0])
+	pathEqualsTo(t, "testdata/fileset/folder/file3", list2[1])
+	pathEqualsTo(t, "testdata/fileset/folder/subfolder", list2[2])
 
 	list2 = list.Clone()
 	list2.FilterOutPrefix("file")
 	require.Len(t, list2, 2)
-	pathEqualsTo(t, "testdata/folder/.hidden", list2[0])
-	pathEqualsTo(t, "testdata/folder/subfolder", list2[1])
+	pathEqualsTo(t, "testdata/fileset/folder/.hidden", list2[0])
+	pathEqualsTo(t, "testdata/fileset/folder/subfolder", list2[1])
 }
 
 func TestResetStatCacheWhenFollowingSymlink(t *testing.T) {
-	testdata := New("testdata")
+	testdata := New("testdata", "fileset")
 	files, err := testdata.ReadDir()
 	require.NoError(t, err)
 	for _, file := range files {
@@ -208,7 +208,7 @@ func TestIsInsideDir(t *testing.T) {
 }
 
 func TestReadFileAsLines(t *testing.T) {
-	lines, err := New("testdata/anotherFile").ReadFileAsLines()
+	lines, err := New("testdata/fileset/anotherFile").ReadFileAsLines()
 	require.NoError(t, err)
 	require.Len(t, lines, 4)
 	require.Equal(t, "line 1", lines[0])
@@ -226,7 +226,7 @@ func TestCopyDir(t *testing.T) {
 	require.NoError(t, err)
 	defer tmp.RemoveAll()
 
-	src := New("testdata")
+	src := New("testdata", "fileset")
 	err = src.CopyDirTo(tmp.Join("dest"))
 	require.NoError(t, err, "copying dir")
 
@@ -264,45 +264,45 @@ func TestParents(t *testing.T) {
 }
 
 func TestFilterDirs(t *testing.T) {
-	testPath := New("testdata")
+	testPath := New("testdata", "fileset")
 
 	list, err := testPath.ReadDir()
 	require.NoError(t, err)
 	require.Len(t, list, 6)
 
-	pathEqualsTo(t, "testdata/anotherFile", list[0])
-	pathEqualsTo(t, "testdata/file", list[1])
-	pathEqualsTo(t, "testdata/folder", list[2])
-	pathEqualsTo(t, "testdata/symlinktofolder", list[3])
-	pathEqualsTo(t, "testdata/test.txt", list[4])
-	pathEqualsTo(t, "testdata/test.txt.gz", list[5])
+	pathEqualsTo(t, "testdata/fileset/anotherFile", list[0])
+	pathEqualsTo(t, "testdata/fileset/file", list[1])
+	pathEqualsTo(t, "testdata/fileset/folder", list[2])
+	pathEqualsTo(t, "testdata/fileset/symlinktofolder", list[3])
+	pathEqualsTo(t, "testdata/fileset/test.txt", list[4])
+	pathEqualsTo(t, "testdata/fileset/test.txt.gz", list[5])
 
 	list.FilterDirs()
 	require.Len(t, list, 2)
-	pathEqualsTo(t, "testdata/folder", list[0])
-	pathEqualsTo(t, "testdata/symlinktofolder", list[1])
+	pathEqualsTo(t, "testdata/fileset/folder", list[0])
+	pathEqualsTo(t, "testdata/fileset/symlinktofolder", list[1])
 }
 
 func TestFilterOutDirs(t *testing.T) {
-	testPath := New("testdata")
+	testPath := New("testdata", "fileset")
 
 	list, err := testPath.ReadDir()
 	require.NoError(t, err)
 	require.Len(t, list, 6)
 
-	pathEqualsTo(t, "testdata/anotherFile", list[0])
-	pathEqualsTo(t, "testdata/file", list[1])
-	pathEqualsTo(t, "testdata/folder", list[2])
-	pathEqualsTo(t, "testdata/symlinktofolder", list[3])
-	pathEqualsTo(t, "testdata/test.txt", list[4])
-	pathEqualsTo(t, "testdata/test.txt.gz", list[5])
+	pathEqualsTo(t, "testdata/fileset/anotherFile", list[0])
+	pathEqualsTo(t, "testdata/fileset/file", list[1])
+	pathEqualsTo(t, "testdata/fileset/folder", list[2])
+	pathEqualsTo(t, "testdata/fileset/symlinktofolder", list[3])
+	pathEqualsTo(t, "testdata/fileset/test.txt", list[4])
+	pathEqualsTo(t, "testdata/fileset/test.txt.gz", list[5])
 
 	list.FilterOutDirs()
 	require.Len(t, list, 4)
-	pathEqualsTo(t, "testdata/anotherFile", list[0])
-	pathEqualsTo(t, "testdata/file", list[1])
-	pathEqualsTo(t, "testdata/test.txt", list[2])
-	pathEqualsTo(t, "testdata/test.txt.gz", list[3])
+	pathEqualsTo(t, "testdata/fileset/anotherFile", list[0])
+	pathEqualsTo(t, "testdata/fileset/file", list[1])
+	pathEqualsTo(t, "testdata/fileset/test.txt", list[2])
+	pathEqualsTo(t, "testdata/fileset/test.txt.gz", list[3])
 }
 
 func TestEquivalentPaths(t *testing.T) {
@@ -314,8 +314,8 @@ func TestEquivalentPaths(t *testing.T) {
 	require.True(t, wd.Join("file1").EquivalentTo(New("file1", "abc", "..")))
 
 	if runtime.GOOS == "windows" {
-		q := New("testdata", "anotherFile")
-		r := New("testdata", "ANOTHE~1")
+		q := New("testdata", "fileset", "anotherFile")
+		r := New("testdata", "fileset", "ANOTHE~1")
 		require.True(t, q.EquivalentTo(r))
 		require.True(t, r.EquivalentTo(q))
 	}
@@ -325,15 +325,15 @@ func TestCanonicalize(t *testing.T) {
 	wd, err := Getwd()
 	require.NoError(t, err)
 
-	p := New("testdata", "anotherFile").Canonical()
-	require.Equal(t, wd.Join("testdata", "anotherFile").String(), p.String())
+	p := New("testdata", "fileset", "anotherFile").Canonical()
+	require.Equal(t, wd.Join("testdata", "fileset", "anotherFile").String(), p.String())
 
-	p = New("testdata", "nonexistentFile").Canonical()
-	require.Equal(t, wd.Join("testdata", "nonexistentFile").String(), p.String())
+	p = New("testdata", "fileset", "nonexistentFile").Canonical()
+	require.Equal(t, wd.Join("testdata", "fileset", "nonexistentFile").String(), p.String())
 
 	if runtime.GOOS == "windows" {
-		q := New("testdata", "ANOTHE~1").Canonical()
-		require.Equal(t, wd.Join("testdata", "anotherFile").String(), q.String())
+		q := New("testdata", "fileset", "ANOTHE~1").Canonical()
+		require.Equal(t, wd.Join("testdata", "fileset", "anotherFile").String(), q.String())
 
 		r := New("c:\\").Canonical()
 		require.Equal(t, "C:\\", r.String())
@@ -371,7 +371,7 @@ func TestRelativeTo(t *testing.T) {
 }
 
 func TestWriteToTempFile(t *testing.T) {
-	tmpDir := New("testdata", "tmp")
+	tmpDir := New("testdata", "fileset", "tmp")
 	err := tmpDir.MkdirAll()
 	require.NoError(t, err)
 	defer tmpDir.RemoveAll()
