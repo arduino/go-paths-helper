@@ -1,7 +1,7 @@
 /*
  * This file is part of PathsHelper library.
  *
- * Copyright 2021 Arduino AG (http://www.arduino.cc/)
+ * Copyright 2023 Arduino AG (http://www.arduino.cc/)
  *
  * PathsHelper library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,32 +27,14 @@
  * the GNU General Public License.
  */
 
-package paths
+package main
 
 import (
-	"testing"
-
-	"github.com/stretchr/testify/require"
+	"fmt"
+	"time"
 )
 
-func TestGzipGunzip(t *testing.T) {
-	zipped := New("testdata", "fileset", "test.txt.gz")
-	unzipped := New("testdata", "fileset", "test.txt")
-
-	tmp, err := MkTempDir("", "")
-	require.NoError(t, err)
-	defer tmp.RemoveAll()
-
-	// Test decoding
-	decoded := tmp.Join("test")
-	err = GUnzip(zipped, decoded)
-	require.NoError(t, err)
-	d, err := decoded.ReadFile()
-	require.NoError(t, err)
-	u, err := unzipped.ReadFile()
-	require.NoError(t, err)
-	require.Equal(t, u, d)
-
-	// Test encoding
-	// TODO
+func main() {
+	time.Sleep(3 * time.Second)
+	fmt.Println("Elapsed!")
 }
