@@ -31,9 +31,8 @@ package paths
 
 import (
 	"compress/gzip"
+	"fmt"
 	"io"
-
-	"github.com/pkg/errors"
 )
 
 // GZip compress src with gzip and writes the compressed file on dst
@@ -45,25 +44,25 @@ import (
 func GUnzip(src, dest *Path) error {
 	gzIn, err := src.Open()
 	if err != nil {
-		return errors.Wrap(err, "opening "+src.String())
+		return fmt.Errorf("opening %s: %w", src, err)
 	}
 	defer gzIn.Close()
 
 	in, err := gzip.NewReader(gzIn)
 	if err != nil {
-		return errors.Wrap(err, "decoding "+src.String())
+		return fmt.Errorf("decoding %s: %w", src, err)
 	}
 	defer in.Close()
 
 	out, err := dest.Create()
 	if err != nil {
-		return errors.Wrap(err, "creating "+dest.String())
+		return fmt.Errorf("creating %s: %w", dest, err)
 	}
 	defer out.Close()
 
 	_, err = io.Copy(out, in)
 	if err != nil {
-		return errors.Wrap(err, "uncompressing "+dest.String())
+		return fmt.Errorf("uncompressing %s: %w", dest, err)
 	}
 
 	return nil

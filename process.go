@@ -32,11 +32,10 @@ package paths
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
 	"os"
 	"os/exec"
-
-	"github.com/pkg/errors"
 )
 
 // Process is representation of an external process run
