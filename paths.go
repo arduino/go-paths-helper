@@ -38,8 +38,6 @@ import (
 	"strings"
 	"syscall"
 	"time"
-
-	"github.com/pkg/errors"
 )
 
 // Path represents a path
@@ -442,7 +440,7 @@ func WriteToTempFile(data []byte, dir *Path, prefix string) (res *Path, err erro
 	if n, err := f.Write(data); err != nil {
 		return nil, err
 	} else if n < len(data) {
-		return nil, errors.Errorf("could not write all data (written %d bytes out of %d)", n, len(data))
+		return nil, fmt.Errorf("could not write all data (written %d bytes out of %d)", n, len(data))
 	}
 	return New(f.Name()), nil
 }
