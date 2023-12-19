@@ -160,4 +160,10 @@ func TestListFilters(t *testing.T) {
 	l16 := list.Clone()
 	l16.FilterPrefix()
 	require.Equal(t, "[]", fmt.Sprintf("%s", l16))
+
+	l17 := list.Clone()
+	l17.Filter(func(p *Path) bool {
+		return p.Base() == "bbbb"
+	})
+	require.Equal(t, "[bbbb aaaa/bbbb]", fmt.Sprintf("%s", l17))
 }
