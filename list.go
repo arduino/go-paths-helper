@@ -91,10 +91,12 @@ func (p *PathList) FilterOutHiddenFiles() {
 	p.FilterOutPrefix(".")
 }
 
-func (p *PathList) filter(filter func(*Path) bool) {
+// Filter will remove all the elements of the list that do not match
+// the specified acceptor function
+func (p *PathList) Filter(acceptorFunc func(*Path) bool) {
 	res := (*p)[:0]
 	for _, path := range *p {
-		if filter(path) {
+        if acceptorFunc(path) {
 			res = append(res, path)
 		}
 	}
@@ -106,7 +108,7 @@ func (p *PathList) FilterOutPrefix(prefixes ...string) {
 	filterFunction := func(path *Path) bool {
 		return !path.HasPrefix(prefixes...)
 	}
-	p.filter(filterFunction)
+	p.Filter(filterFunction)
 }
 
 // FilterPrefix remove all entries not having one of the specified prefixes
@@ -114,7 +116,7 @@ func (p *PathList) FilterPrefix(prefixes ...string) {
 	filterFunction := func(path *Path) bool {
 		return path.HasPrefix(prefixes...)
 	}
-	p.filter(filterFunction)
+	p.Filter(filterFunction)
 }
 
 // FilterOutSuffix remove all entries having one of the specified suffixes
@@ -122,7 +124,7 @@ func (p *PathList) FilterOutSuffix(suffixies ...string) {
 	filterFunction := func(path *Path) bool {
 		return !path.HasSuffix(suffixies...)
 	}
-	p.filter(filterFunction)
+	p.Filter(filterFunction)
 }
 
 // FilterSuffix remove all entries not having one of the specified suffixes
@@ -130,7 +132,7 @@ func (p *PathList) FilterSuffix(suffixies ...string) {
 	filterFunction := func(path *Path) bool {
 		return path.HasSuffix(suffixies...)
 	}
-	p.filter(filterFunction)
+	p.Filter(filterFunction)
 }
 
 // Add adds a Path to the PathList
