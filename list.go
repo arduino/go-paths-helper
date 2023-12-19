@@ -93,10 +93,10 @@ func (p *PathList) FilterOutHiddenFiles() {
 
 // Filter will remove all the elements of the list that do not match
 // the specified acceptor function
-func (p *PathList) Filter(accpetorFunc func(*Path) bool) {
+func (p *PathList) Filter(acceptorFunc func(*Path) bool) {
 	res := (*p)[:0]
 	for _, path := range *p {
-		if accpetorFunc(path) {
+        if acceptorFunc(path) {
 			res = append(res, path)
 		}
 	}
