@@ -32,6 +32,7 @@ package paths
 import (
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -69,8 +70,16 @@ func NewFromFile(file *os.File) *Path {
 // Stat returns a FileInfo describing the named file. The result is
 // cached internally for next queries. To ensure that the cached
 // FileInfo entry is updated just call Stat again.
-func (p *Path) Stat() (os.FileInfo, error) {
+func (p *Path) Stat() (fs.FileInfo, error) {
 	return os.Stat(p.path)
+}
+
+// Lstat returns a FileInfo describing the named file. If the file is
+// a symbolic link, the returned FileInfo describes the symbolic link.
+// Lstat makes no attempt to follow the link. If there is an error, it
+// will be of type *PathError.
+func (p *Path) Lstat() (fs.FileInfo, error) {
+	return os.Lstat(p.path)
 }
 
 // Clone create a copy of the Path object
