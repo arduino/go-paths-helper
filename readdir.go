@@ -69,27 +69,7 @@ func (p *Path) ReadDir(filters ...ReadDirFilter) (PathList, error) {
 // ReadDirRecursive returns a PathList containing the content of the directory
 // and its subdirectories pointed by the current Path
 func (p *Path) ReadDirRecursive() (PathList, error) {
-	infos, err := os.ReadDir(p.path)
-	if err != nil {
-		return nil, err
-	}
-	paths := PathList{}
-	for _, info := range infos {
-		path := p.Join(info.Name())
-		paths.Add(path)
-
-		if isDir, err := path.IsDirCheck(); err != nil {
-			return nil, err
-		} else if isDir {
-			subPaths, err := path.ReadDirRecursive()
-			if err != nil {
-				return nil, err
-			}
-			paths.AddAll(subPaths)
-		}
-
-	}
-	return paths, nil
+	return p.ReadDirRecursiveFiltered(nil)
 }
 
 // ReadDirRecursiveFiltered returns a PathList containing the content of the directory
