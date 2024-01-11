@@ -81,41 +81,47 @@ func (p *Path) ReadDirRecursive() (PathList, error) {
 //   - `filters` are the filters that are checked to determine if the entry should be
 //     added to the resulting PathList
 func (p *Path) ReadDirRecursiveFiltered(recursionFilter ReadDirFilter, filters ...ReadDirFilter) (PathList, error) {
-	infos, err := os.ReadDir(p.path)
-	if err != nil {
-		return nil, err
-	}
+	var search func(*Path) (PathList, error)
 
-	accept := func(p *Path) bool {
-		for _, filter := range filters {
-			if !filter(p) {
-				return false
-			}
-		}
-		return true
-	}
-
-	paths := PathList{}
-	for _, info := range infos {
-		path := p.Join(info.Name())
-
-		if accept(path) {
-			paths.Add(path)
+	search = func(currPath *Path) (PathList, error) {
+		infos, err := os.ReadDir(currPath.path)
+		if err != nil {
+			return nil, err
 		}
 
-		if recursionFilter == nil || recursionFilter(path) {
-			if isDir, err := path.IsDirCheck(); err != nil {
-				return nil, err
-			} else if isDir {
-				subPaths, err := path.ReadDirRecursiveFiltered(recursionFilter, filters...)
-				if err != nil {
-					return nil, err
+		accept := func(p *Path) bool {
+			for _, filter := range filters {
+				if !filter(p) {
+					return false
 				}
-				paths.AddAll(subPaths)
+			}
+			return true
+		}
+
+		paths := PathList{}
+		for _, info := range infos {
+			path := currPath.Join(info.Name())
+
+			if accept(path) {
+				paths.Add(path)
+			}
+
+			if recursionFilter == nil || recursionFilter(path) {
+				if isDir, err := path.IsDirCheck(); err != nil {
+					return nil, err
+				} else if isDir {
+					subPaths, err := search(path)
+					if err != nil {
+						return nil, err
+					}
+					paths.AddAll(subPaths)
+				}
 			}
 		}
+		return paths, nil
 	}
-	return paths, nil
+
+	return search(p)
 }
 
 // FilterDirectories is a ReadDirFilter that accepts only directories
