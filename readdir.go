@@ -30,7 +30,7 @@
 package paths
 
 import (
-	"io/ioutil"
+	"os"
 	"strings"
 )
 
@@ -41,7 +41,7 @@ type ReadDirFilter func(file *Path) bool
 // ReadDir returns a PathList containing the content of the directory
 // pointed by the current Path. The resulting list is filtered by the given filters chained.
 func (p *Path) ReadDir(filters ...ReadDirFilter) (PathList, error) {
-	infos, err := ioutil.ReadDir(p.path)
+	infos, err := os.ReadDir(p.path)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (p *Path) ReadDir(filters ...ReadDirFilter) (PathList, error) {
 // ReadDirRecursive returns a PathList containing the content of the directory
 // and its subdirectories pointed by the current Path
 func (p *Path) ReadDirRecursive() (PathList, error) {
-	infos, err := ioutil.ReadDir(p.path)
+	infos, err := os.ReadDir(p.path)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (p *Path) ReadDirRecursive() (PathList, error) {
 //   - `filters` are the filters that are checked to determine if the entry should be
 //     added to the resulting PathList
 func (p *Path) ReadDirRecursiveFiltered(recursionFilter ReadDirFilter, filters ...ReadDirFilter) (PathList, error) {
-	infos, err := ioutil.ReadDir(p.path)
+	infos, err := os.ReadDir(p.path)
 	if err != nil {
 		return nil, err
 	}
