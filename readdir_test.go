@@ -33,6 +33,7 @@ import (
 	"fmt"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -244,4 +245,72 @@ func TestReadDirRecursiveFiltered(t *testing.T) {
 	pathEqualsTo(t, "testdata/fileset/symlinktofolder/subfolder", l[6])
 	pathEqualsTo(t, "testdata/fileset/test.txt", l[7])
 	pathEqualsTo(t, "testdata/fileset/test.txt.gz", l[8])
+}
+
+func TestReadDirRecursiveLoopDetection(t *testing.T) {
+	loopsPath := New("testdata", "loops")
+	unbuondedReaddir := func(testdir string) (PathList, error) {
+		// This is required to unbound the recursion, otherwise it will stop
+		// when the paths becomes too long due to the symlink loop: this is not
+		// what we want, we are looking for an early detection of the loop.
+		skipBrokenLinks := func(p *Path) bool {
+			_, err := p.Stat()
+			return err == nil
+		}
+
+		var files PathList
+		var err error
+		done := make(chan bool)
+		go func() {
+			files, err = loopsPath.Join(testdir).ReadDirRecursiveFiltered(
+				skipBrokenLinks,
+			)
+			done <- true
+		}()
+		require.Eventually(
+			t,
+			func() bool {
+				select {
+				case <-done:
+					return true
+				default:
+					return false
+				}
+			},
+			5*time.Second,
+			10*time.Millisecond,
+			"Infinite symlink loop while loading sketch",
+		)
+		return files, err
+	}
+
+	for _, dir := range []string{"loop_1", "loop_2", "loop_3", "loop_4"} {
+		l, err := unbuondedReaddir(dir)
+		require.EqualError(t, err, "directories symlink loop detected", "loop not detected in %s", dir)
+		require.Nil(t, l)
+	}
+
+	{
+		l, err := unbuondedReaddir("regular_1")
+		require.NoError(t, err)
+		require.Len(t, l, 4)
+		l.Sort()
+		pathEqualsTo(t, "testdata/loops/regular_1/dir1", l[0])
+		pathEqualsTo(t, "testdata/loops/regular_1/dir1/file1", l[1])
+		pathEqualsTo(t, "testdata/loops/regular_1/dir2", l[2])
+		pathEqualsTo(t, "testdata/loops/regular_1/dir2/file1", l[3])
+	}
+
+	{
+		l, err := unbuondedReaddir("regular_2")
+		require.NoError(t, err)
+		require.Len(t, l, 6)
+		l.Sort()
+		pathEqualsTo(t, "testdata/loops/regular_2/dir1", l[0])
+		pathEqualsTo(t, "testdata/loops/regular_2/dir1/file1", l[1])
+		pathEqualsTo(t, "testdata/loops/regular_2/dir2", l[2])
+		pathEqualsTo(t, "testdata/loops/regular_2/dir2/dir1", l[3])
+		pathEqualsTo(t, "testdata/loops/regular_2/dir2/dir1/file1", l[4])
+		pathEqualsTo(t, "testdata/loops/regular_2/dir2/file2", l[5])
+	}
 }

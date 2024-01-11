@@ -30,6 +30,7 @@
 package paths
 
 import (
+	"errors"
 	"os"
 	"strings"
 )
@@ -83,7 +84,15 @@ func (p *Path) ReadDirRecursive() (PathList, error) {
 func (p *Path) ReadDirRecursiveFiltered(recursionFilter ReadDirFilter, filters ...ReadDirFilter) (PathList, error) {
 	var search func(*Path) (PathList, error)
 
+	explored := map[string]bool{}
 	search = func(currPath *Path) (PathList, error) {
+		canonical := currPath.Canonical().path
+		if explored[canonical] {
+			return nil, errors.New("directories symlink loop detected")
+		}
+		explored[canonical] = true
+		defer delete(explored, canonical)
+
 		infos, err := os.ReadDir(currPath.path)
 		if err != nil {
 			return nil, err
