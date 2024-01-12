@@ -250,21 +250,11 @@ func TestReadDirRecursiveFiltered(t *testing.T) {
 func TestReadDirRecursiveLoopDetection(t *testing.T) {
 	loopsPath := New("testdata", "loops")
 	unbuondedReaddir := func(testdir string) (PathList, error) {
-		// This is required to unbound the recursion, otherwise it will stop
-		// when the paths becomes too long due to the symlink loop: this is not
-		// what we want, we are looking for an early detection of the loop.
-		skipBrokenLinks := func(p *Path) bool {
-			_, err := p.Stat()
-			return err == nil
-		}
-
 		var files PathList
 		var err error
 		done := make(chan bool)
 		go func() {
-			files, err = loopsPath.Join(testdir).ReadDirRecursiveFiltered(
-				skipBrokenLinks,
-			)
+			files, err = loopsPath.Join(testdir).ReadDirRecursive()
 			done <- true
 		}()
 		require.Eventually(
