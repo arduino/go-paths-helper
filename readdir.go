@@ -30,7 +30,8 @@
 package paths
 
 import (
-	"io/ioutil"
+	"errors"
+	"os"
 	"strings"
 )
 
@@ -41,7 +42,7 @@ type ReadDirFilter func(file *Path) bool
 // ReadDir returns a PathList containing the content of the directory
 // pointed by the current Path. The resulting list is filtered by the given filters chained.
 func (p *Path) ReadDir(filters ...ReadDirFilter) (PathList, error) {
-	infos, err := ioutil.ReadDir(p.path)
+	infos, err := os.ReadDir(p.path)
 	if err != nil {
 		return nil, err
 	}
@@ -69,27 +70,7 @@ func (p *Path) ReadDir(filters ...ReadDirFilter) (PathList, error) {
 // ReadDirRecursive returns a PathList containing the content of the directory
 // and its subdirectories pointed by the current Path
 func (p *Path) ReadDirRecursive() (PathList, error) {
-	infos, err := ioutil.ReadDir(p.path)
-	if err != nil {
-		return nil, err
-	}
-	paths := PathList{}
-	for _, info := range infos {
-		path := p.Join(info.Name())
-		paths.Add(path)
-
-		if isDir, err := path.IsDirCheck(); err != nil {
-			return nil, err
-		} else if isDir {
-			subPaths, err := path.ReadDirRecursive()
-			if err != nil {
-				return nil, err
-			}
-			paths.AddAll(subPaths)
-		}
-
-	}
-	return paths, nil
+	return p.ReadDirRecursiveFiltered(nil)
 }
 
 // ReadDirRecursiveFiltered returns a PathList containing the content of the directory
@@ -101,41 +82,55 @@ func (p *Path) ReadDirRecursive() (PathList, error) {
 //   - `filters` are the filters that are checked to determine if the entry should be
 //     added to the resulting PathList
 func (p *Path) ReadDirRecursiveFiltered(recursionFilter ReadDirFilter, filters ...ReadDirFilter) (PathList, error) {
-	infos, err := ioutil.ReadDir(p.path)
-	if err != nil {
-		return nil, err
-	}
+	var search func(*Path) (PathList, error)
 
-	accept := func(p *Path) bool {
-		for _, filter := range filters {
-			if !filter(p) {
-				return false
-			}
+	explored := map[string]bool{}
+	search = func(currPath *Path) (PathList, error) {
+		canonical := currPath.Canonical().path
+		if explored[canonical] {
+			return nil, errors.New("directories symlink loop detected")
 		}
-		return true
-	}
+		explored[canonical] = true
+		defer delete(explored, canonical)
 
-	paths := PathList{}
-	for _, info := range infos {
-		path := p.Join(info.Name())
-
-		if accept(path) {
-			paths.Add(path)
+		infos, err := os.ReadDir(currPath.path)
+		if err != nil {
+			return nil, err
 		}
 
-		if recursionFilter == nil || recursionFilter(path) {
-			if isDir, err := path.IsDirCheck(); err != nil {
-				return nil, err
-			} else if isDir {
-				subPaths, err := path.ReadDirRecursiveFiltered(recursionFilter, filters...)
-				if err != nil {
-					return nil, err
+		accept := func(p *Path) bool {
+			for _, filter := range filters {
+				if !filter(p) {
+					return false
 				}
-				paths.AddAll(subPaths)
+			}
+			return true
+		}
+
+		paths := PathList{}
+		for _, info := range infos {
+			path := currPath.Join(info.Name())
+
+			if accept(path) {
+				paths.Add(path)
+			}
+
+			if recursionFilter == nil || recursionFilter(path) {
+				if isDir, err := path.IsDirCheck(); err != nil {
+					return nil, err
+				} else if isDir {
+					subPaths, err := search(path)
+					if err != nil {
+						return nil, err
+					}
+					paths.AddAll(subPaths)
+				}
 			}
 		}
+		return paths, nil
 	}
-	return paths, nil
+
+	return search(p)
 }
 
 // FilterDirectories is a ReadDirFilter that accepts only directories

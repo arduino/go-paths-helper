@@ -32,7 +32,6 @@ package paths
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -418,14 +417,14 @@ func (p *Path) Chtimes(atime, mtime time.Time) error {
 
 // ReadFile reads the file named by filename and returns the contents
 func (p *Path) ReadFile() ([]byte, error) {
-	return ioutil.ReadFile(p.path)
+	return os.ReadFile(p.path)
 }
 
 // WriteFile writes data to a file named by filename. If the file
 // does not exist, WriteFile creates it otherwise WriteFile truncates
 // it before writing.
 func (p *Path) WriteFile(data []byte) error {
-	return ioutil.WriteFile(p.path, data, os.FileMode(0644))
+	return os.WriteFile(p.path, data, os.FileMode(0644))
 }
 
 // WriteToTempFile writes data to a newly generated temporary file.
