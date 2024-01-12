@@ -303,4 +303,18 @@ func TestReadDirRecursiveLoopDetection(t *testing.T) {
 		pathEqualsTo(t, "testdata/loops/regular_2/dir2/dir1/file1", l[4])
 		pathEqualsTo(t, "testdata/loops/regular_2/dir2/file2", l[5])
 	}
+
+	{
+		l, err := unbuondedReaddir("regular_3")
+		require.NoError(t, err)
+		require.Len(t, l, 7)
+		l.Sort()
+		pathEqualsTo(t, "testdata/loops/regular_3/dir1", l[0])
+		pathEqualsTo(t, "testdata/loops/regular_3/dir1/file1", l[1])
+		pathEqualsTo(t, "testdata/loops/regular_3/dir2", l[2])
+		pathEqualsTo(t, "testdata/loops/regular_3/dir2/dir1", l[3])
+		pathEqualsTo(t, "testdata/loops/regular_3/dir2/dir1/file1", l[4])
+		pathEqualsTo(t, "testdata/loops/regular_3/dir2/file2", l[5])
+		pathEqualsTo(t, "testdata/loops/regular_3/link", l[6]) // broken symlink is reported in files
+	}
 }
