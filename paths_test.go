@@ -284,25 +284,49 @@ func TestFilterDirs(t *testing.T) {
 }
 
 func TestFilterOutDirs(t *testing.T) {
-	testPath := New("testdata", "fileset")
+	{
+		testPath := New("testdata", "fileset")
 
-	list, err := testPath.ReadDir()
-	require.NoError(t, err)
-	require.Len(t, list, 6)
+		list, err := testPath.ReadDir()
+		require.NoError(t, err)
+		require.Len(t, list, 6)
 
-	pathEqualsTo(t, "testdata/fileset/anotherFile", list[0])
-	pathEqualsTo(t, "testdata/fileset/file", list[1])
-	pathEqualsTo(t, "testdata/fileset/folder", list[2])
-	pathEqualsTo(t, "testdata/fileset/symlinktofolder", list[3])
-	pathEqualsTo(t, "testdata/fileset/test.txt", list[4])
-	pathEqualsTo(t, "testdata/fileset/test.txt.gz", list[5])
+		pathEqualsTo(t, "testdata/fileset/anotherFile", list[0])
+		pathEqualsTo(t, "testdata/fileset/file", list[1])
+		pathEqualsTo(t, "testdata/fileset/folder", list[2])
+		pathEqualsTo(t, "testdata/fileset/symlinktofolder", list[3])
+		pathEqualsTo(t, "testdata/fileset/test.txt", list[4])
+		pathEqualsTo(t, "testdata/fileset/test.txt.gz", list[5])
 
-	list.FilterOutDirs()
-	require.Len(t, list, 4)
-	pathEqualsTo(t, "testdata/fileset/anotherFile", list[0])
-	pathEqualsTo(t, "testdata/fileset/file", list[1])
-	pathEqualsTo(t, "testdata/fileset/test.txt", list[2])
-	pathEqualsTo(t, "testdata/fileset/test.txt.gz", list[3])
+		list.FilterOutDirs()
+		require.Len(t, list, 4)
+		pathEqualsTo(t, "testdata/fileset/anotherFile", list[0])
+		pathEqualsTo(t, "testdata/fileset/file", list[1])
+		pathEqualsTo(t, "testdata/fileset/test.txt", list[2])
+		pathEqualsTo(t, "testdata/fileset/test.txt.gz", list[3])
+	}
+
+	{
+		list, err := New("testdata", "broken_symlink", "dir_1").ReadDirRecursive()
+		require.NoError(t, err)
+
+		require.Len(t, list, 7)
+		pathEqualsTo(t, "testdata/broken_symlink/dir_1/broken_link", list[0])
+		pathEqualsTo(t, "testdata/broken_symlink/dir_1/file2", list[1])
+		pathEqualsTo(t, "testdata/broken_symlink/dir_1/linked_dir", list[2])
+		pathEqualsTo(t, "testdata/broken_symlink/dir_1/linked_dir/file1", list[3])
+		pathEqualsTo(t, "testdata/broken_symlink/dir_1/linked_file", list[4])
+		pathEqualsTo(t, "testdata/broken_symlink/dir_1/real_dir", list[5])
+		pathEqualsTo(t, "testdata/broken_symlink/dir_1/real_dir/file1", list[6])
+
+		list.FilterOutDirs()
+		require.Len(t, list, 5)
+		pathEqualsTo(t, "testdata/broken_symlink/dir_1/broken_link", list[0])
+		pathEqualsTo(t, "testdata/broken_symlink/dir_1/file2", list[1])
+		pathEqualsTo(t, "testdata/broken_symlink/dir_1/linked_dir/file1", list[2])
+		pathEqualsTo(t, "testdata/broken_symlink/dir_1/linked_file", list[3])
+		pathEqualsTo(t, "testdata/broken_symlink/dir_1/real_dir/file1", list[4])
+	}
 }
 
 func TestEquivalentPaths(t *testing.T) {
