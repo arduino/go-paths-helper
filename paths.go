@@ -418,6 +418,13 @@ func (p *Path) CopyDirTo(dst *Path) error {
 	return nil
 }
 
+// Chmod changes the mode of the named file to mode. If the file is a
+// symbolic link, it changes the mode of the link's target. If there
+// is an error, it will be of type *os.PathError.
+func (p *Path) Chmod(mode fs.FileMode) error {
+	return os.Chmod(p.path, mode)
+}
+
 // Chtimes changes the access and modification times of the named file,
 // similar to the Unix utime() or utimes() functions.
 func (p *Path) Chtimes(atime, mtime time.Time) error {

@@ -78,7 +78,7 @@ func (p *PathList) FilterDirs() {
 func (p *PathList) FilterOutDirs() {
 	res := (*p)[:0]
 	for _, path := range *p {
-		if path.IsNotDir() {
+		if !path.IsDir() {
 			res = append(res, path)
 		}
 	}
@@ -96,7 +96,7 @@ func (p *PathList) FilterOutHiddenFiles() {
 func (p *PathList) Filter(acceptorFunc func(*Path) bool) {
 	res := (*p)[:0]
 	for _, path := range *p {
-        if acceptorFunc(path) {
+		if acceptorFunc(path) {
 			res = append(res, path)
 		}
 	}

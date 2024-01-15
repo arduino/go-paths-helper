@@ -31,7 +31,9 @@ package paths
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
+	"runtime"
 	"testing"
 	"time"
 
@@ -250,21 +252,11 @@ func TestReadDirRecursiveFiltered(t *testing.T) {
 func TestReadDirRecursiveLoopDetection(t *testing.T) {
 	loopsPath := New("testdata", "loops")
 	unbuondedReaddir := func(testdir string) (PathList, error) {
-		// This is required to unbound the recursion, otherwise it will stop
-		// when the paths becomes too long due to the symlink loop: this is not
-		// what we want, we are looking for an early detection of the loop.
-		skipBrokenLinks := func(p *Path) bool {
-			_, err := p.Stat()
-			return err == nil
-		}
-
 		var files PathList
 		var err error
 		done := make(chan bool)
 		go func() {
-			files, err = loopsPath.Join(testdir).ReadDirRecursiveFiltered(
-				skipBrokenLinks,
-			)
+			files, err = loopsPath.Join(testdir).ReadDirRecursive()
 			done <- true
 		}()
 		require.Eventually(
@@ -312,5 +304,40 @@ func TestReadDirRecursiveLoopDetection(t *testing.T) {
 		pathEqualsTo(t, "testdata/loops/regular_2/dir2/dir1", l[3])
 		pathEqualsTo(t, "testdata/loops/regular_2/dir2/dir1/file1", l[4])
 		pathEqualsTo(t, "testdata/loops/regular_2/dir2/file2", l[5])
+	}
+
+	{
+		l, err := unbuondedReaddir("regular_3")
+		require.NoError(t, err)
+		require.Len(t, l, 7)
+		l.Sort()
+		pathEqualsTo(t, "testdata/loops/regular_3/dir1", l[0])
+		pathEqualsTo(t, "testdata/loops/regular_3/dir1/file1", l[1])
+		pathEqualsTo(t, "testdata/loops/regular_3/dir2", l[2])
+		pathEqualsTo(t, "testdata/loops/regular_3/dir2/dir1", l[3])
+		pathEqualsTo(t, "testdata/loops/regular_3/dir2/dir1/file1", l[4])
+		pathEqualsTo(t, "testdata/loops/regular_3/dir2/file2", l[5])
+		pathEqualsTo(t, "testdata/loops/regular_3/link", l[6]) // broken symlink is reported in files
+	}
+
+	if runtime.GOOS != "windows" {
+		dir1 := loopsPath.Join("regular_4_with_permission_error", "dir1")
+
+		l, err := unbuondedReaddir("regular_4_with_permission_error")
+		require.NoError(t, err)
+		require.NotEmpty(t, l)
+
+		dir1Stat, err := dir1.Stat()
+		require.NoError(t, err)
+		err = dir1.Chmod(fs.FileMode(0)) // Enforce permission error
+		require.NoError(t, err)
+		t.Cleanup(func() {
+			// Restore normal permission after the test
+			dir1.Chmod(dir1Stat.Mode())
+		})
+
+		l, err = unbuondedReaddir("regular_4_with_permission_error")
+		require.Error(t, err)
+		require.Nil(t, l)
 	}
 }

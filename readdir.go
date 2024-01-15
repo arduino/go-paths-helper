@@ -116,9 +116,7 @@ func (p *Path) ReadDirRecursiveFiltered(recursionFilter ReadDirFilter, filters .
 			}
 
 			if recursionFilter == nil || recursionFilter(path) {
-				if isDir, err := path.IsDirCheck(); err != nil {
-					return nil, err
-				} else if isDir {
+				if path.IsDir() {
 					subPaths, err := search(path)
 					if err != nil {
 						return nil, err
