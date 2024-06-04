@@ -27,12 +27,22 @@
 // the GNU General Public License.
 //
 
-//go:build !windows
+//go:build !windows && !linux
 
 package paths
 
-import "os/exec"
+import (
+	"os/exec"
+)
 
 func tellCommandNotToSpawnShell(_ *exec.Cmd) {
 	// no op
+}
+
+func tellCommandToStartOnNewProcessGroup(_ *exec.Cmd) {
+	// no op
+}
+
+func kill(oscmd *exec.Cmd) error {
+	return oscmd.Process.Kill()
 }
