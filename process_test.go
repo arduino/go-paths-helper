@@ -31,6 +31,7 @@ package paths
 
 import (
 	"context"
+	"runtime"
 	"testing"
 	"time"
 
@@ -53,4 +54,21 @@ func TestProcessWithinContext(t *testing.T) {
 	require.Error(t, err)
 	require.Less(t, time.Since(start), 500*time.Millisecond)
 	cancel()
+}
+
+func TestKillProcessGroupOnLinux(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("skipping test on non-linux system")
+	}
+
+	p, err := NewProcess(nil, "bash", "-c", "sleep 5 ; echo -n 5")
+	require.NoError(t, err)
+	start := time.Now()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	_, _, err = p.RunAndCaptureOutput(ctx)
+	require.EqualError(t, err, "signal: killed")
+	// Assert that the process was killed within the timeout
+	require.Less(t, time.Since(start), 2*time.Second)
 }
