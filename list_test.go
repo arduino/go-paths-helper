@@ -57,12 +57,15 @@ func TestListConstructors(t *testing.T) {
 	require.True(t, list3.ContainsEquivalentTo(New("d/../a")))
 
 	list4 := list3.Clone()
+	require.True(t, list3.Equals(list4))
 	require.Equal(t, "[a b c]", fmt.Sprintf("%s", list4))
 	list4.AddIfMissing(New("d"))
 	require.Equal(t, "[a b c d]", fmt.Sprintf("%s", list4))
 	list4.AddIfMissing(New("b"))
 	require.Equal(t, "[a b c d]", fmt.Sprintf("%s", list4))
 	list4.AddAllMissing(NewPathList("a", "e", "i", "o", "u"))
+	require.False(t, list3.Equals(list4))
+	require.False(t, list4.Equals(list3))
 	require.Equal(t, "[a b c d e i o u]", fmt.Sprintf("%s", list4))
 }
 
