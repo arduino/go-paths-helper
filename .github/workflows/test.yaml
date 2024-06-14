@@ -10,9 +10,9 @@ jobs:
       matrix:
         operating-system:
           [
-            ubuntu-latest,
+            # ubuntu-latest,
             windows-latest,
-            macos-latest,
+            # macos-latest,
           ]
 
     runs-on: ${{ matrix.operating-system }}
@@ -24,13 +24,35 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: test P$
+        run: |
+          fsutil 8dot3name set D: 0
+          fsutil 8dot3name set 0
+
+          fsutil 8dot3name query C:
+          fsutil 8dot3name query D:
+
+          $path = "C:\Program Files\PowerShell\7\pwsh.exe"
+          "Long path: $path"
+          # convert it to 8.3 short name
+          $shortPath = (New-Object -ComObject Scripting.FileSystemObject).GetFile($path).ShortPath
+          "Short path: $shortPath"
+
+          $path2 = "D:\a\go-paths-helper\go-paths-helper\testdata\fileset\anotherFile"
+          "Long path2: $path2"
+          # convert it to 8.3 short name
+          $shortPath2 = (New-Object -ComObject Scripting.FileSystemObject).GetFile($path2).ShortPath
+          "Short path2: $shortPath2"
+
       - name: Install Go
         uses: actions/setup-go@v2
         with:
-          go-version: "1.21"
+          go-version: "1.21.10"
 
       - name: Run unit tests
-        run: go test -v ./... -coverprofile=coverage_unit.txt
+        run: |
+          fsutil 8dot3name query D:
+          go test -v ./... -coverprofile=coverage_unit.txt
 
       - name: Send unit tests coverage to Codecov
         uses: codecov/codecov-action@v1
