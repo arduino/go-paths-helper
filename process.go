@@ -138,6 +138,21 @@ func (p *Process) Wait() error {
 	return p.cmd.Wait()
 }
 
+// WaitWithinContext wait for the process to complete. If the given context is canceled
+// before the normal process termination, the process is killed.
+func (p *Process) WaitWithinContext(ctx context.Context) error {
+	completed := make(chan struct{})
+	defer close(completed)
+	go func() {
+		select {
+		case <-ctx.Done():
+			p.Kill()
+		case <-completed:
+		}
+	}()
+	return p.Wait()
+}
+
 // Signal sends a signal to the Process. Sending Interrupt on Windows is not implemented.
 func (p *Process) Signal(sig os.Signal) error {
 	return p.cmd.Process.Signal(sig)
@@ -188,16 +203,7 @@ func (p *Process) RunWithinContext(ctx context.Context) error {
 	if err := p.Start(); err != nil {
 		return err
 	}
-	completed := make(chan struct{})
-	defer close(completed)
-	go func() {
-		select {
-		case <-ctx.Done():
-			p.Kill()
-		case <-completed:
-		}
-	}()
-	return p.Wait()
+	return p.WaitWithinContext(ctx)
 }
 
 // RunAndCaptureOutput starts the specified command and waits for it to complete. If the given context
