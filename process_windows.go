@@ -30,8 +30,12 @@
 package paths
 
 import (
+	"fmt"
 	"os/exec"
 	"syscall"
+	"unsafe"
+
+	"golang.org/x/sys/windows"
 )
 
 func tellCommandNotToSpawnShell(oscmd *exec.Cmd) {
@@ -46,5 +50,54 @@ func tellCommandToStartOnNewProcessGroup(_ *exec.Cmd) {
 }
 
 func kill(oscmd *exec.Cmd) error {
-	return oscmd.Process.Kill()
+	parentProcessMap, err := createParentProcessSnapshot()
+	if err != nil {
+		return err
+	}
+	return killPidTree(uint32(oscmd.Process.Pid), parentProcessMap)
+}
+
+// createParentProcessSnapshot returns a map that correlate a process
+// with its parent process: childPid -> parentPid
+func createParentProcessSnapshot() (map[uint32]uint32, error) {
+	// Inspired by: https://stackoverflow.com/a/36089871/1655275
+
+	// Make a snapshot of the current running processes
+	snapshot, err := windows.CreateToolhelp32Snapshot(windows.TH32CS_SNAPPROCESS, 0)
+	if err != nil {
+		return nil, fmt.Errorf("getting running processes snapshot: %w", err)
+	}
+	defer windows.CloseHandle(snapshot)
+
+	// Iterate the result and extract the parent-child relationship
+	processParentMap := map[uint32]uint32{}
+	var processEntry windows.ProcessEntry32
+	processEntry.Size = uint32(unsafe.Sizeof(processEntry))
+	hasData := (windows.Process32First(snapshot, &processEntry) == nil)
+	for hasData {
+		processParentMap[processEntry.ProcessID] = processEntry.ParentProcessID
+		hasData = (windows.Process32Next(snapshot, &processEntry) == nil)
+	}
+	return processParentMap, nil
+}
+
+func killPidTree(pid uint32, parentProcessMap map[uint32]uint32) error {
+	for childPid, parentPid := range parentProcessMap {
+		if parentPid == pid {
+			// Descend process tree
+			if err := killPidTree(childPid, parentProcessMap); err != nil {
+				return fmt.Errorf("error killing child process: %w", err)
+			}
+		}
+	}
+	return killPid(pid)
+}
+
+func killPid(pid uint32) error {
+	process, err := windows.OpenProcess(windows.PROCESS_ALL_ACCESS, false, pid)
+	if err != nil {
+		return fmt.Errorf("opening process for kill: %w", err)
+	}
+	defer windows.CloseHandle(process)
+	return windows.TerminateProcess(process, 128)
 }
