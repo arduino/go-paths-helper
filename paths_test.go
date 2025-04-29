@@ -268,14 +268,15 @@ func TestFilterDirs(t *testing.T) {
 
 	list, err := testPath.ReadDir()
 	require.NoError(t, err)
-	require.Len(t, list, 6)
+	require.Len(t, list, 7)
 
-	pathEqualsTo(t, "testdata/fileset/anotherFile", list[0])
-	pathEqualsTo(t, "testdata/fileset/file", list[1])
-	pathEqualsTo(t, "testdata/fileset/folder", list[2])
-	pathEqualsTo(t, "testdata/fileset/symlinktofolder", list[3])
-	pathEqualsTo(t, "testdata/fileset/test.txt", list[4])
-	pathEqualsTo(t, "testdata/fileset/test.txt.gz", list[5])
+	pathEqualsTo(t, "testdata/fileset/.gitattributes", list[0])
+	pathEqualsTo(t, "testdata/fileset/anotherFile", list[1])
+	pathEqualsTo(t, "testdata/fileset/file", list[2])
+	pathEqualsTo(t, "testdata/fileset/folder", list[3])
+	pathEqualsTo(t, "testdata/fileset/symlinktofolder", list[4])
+	pathEqualsTo(t, "testdata/fileset/test.txt", list[5])
+	pathEqualsTo(t, "testdata/fileset/test.txt.gz", list[6])
 
 	list.FilterDirs()
 	require.Len(t, list, 2)
@@ -289,21 +290,23 @@ func TestFilterOutDirs(t *testing.T) {
 
 		list, err := testPath.ReadDir()
 		require.NoError(t, err)
-		require.Len(t, list, 6)
+		require.Len(t, list, 7)
 
-		pathEqualsTo(t, "testdata/fileset/anotherFile", list[0])
-		pathEqualsTo(t, "testdata/fileset/file", list[1])
-		pathEqualsTo(t, "testdata/fileset/folder", list[2])
-		pathEqualsTo(t, "testdata/fileset/symlinktofolder", list[3])
-		pathEqualsTo(t, "testdata/fileset/test.txt", list[4])
-		pathEqualsTo(t, "testdata/fileset/test.txt.gz", list[5])
+		pathEqualsTo(t, "testdata/fileset/.gitattributes", list[0])
+		pathEqualsTo(t, "testdata/fileset/anotherFile", list[1])
+		pathEqualsTo(t, "testdata/fileset/file", list[2])
+		pathEqualsTo(t, "testdata/fileset/folder", list[3])
+		pathEqualsTo(t, "testdata/fileset/symlinktofolder", list[4])
+		pathEqualsTo(t, "testdata/fileset/test.txt", list[5])
+		pathEqualsTo(t, "testdata/fileset/test.txt.gz", list[6])
 
 		list.FilterOutDirs()
-		require.Len(t, list, 4)
-		pathEqualsTo(t, "testdata/fileset/anotherFile", list[0])
-		pathEqualsTo(t, "testdata/fileset/file", list[1])
-		pathEqualsTo(t, "testdata/fileset/test.txt", list[2])
-		pathEqualsTo(t, "testdata/fileset/test.txt.gz", list[3])
+		require.Len(t, list, 5)
+		pathEqualsTo(t, "testdata/fileset/.gitattributes", list[0])
+		pathEqualsTo(t, "testdata/fileset/anotherFile", list[1])
+		pathEqualsTo(t, "testdata/fileset/file", list[2])
+		pathEqualsTo(t, "testdata/fileset/test.txt", list[3])
+		pathEqualsTo(t, "testdata/fileset/test.txt.gz", list[4])
 	}
 
 	{
