@@ -56,7 +56,7 @@ func NewProcess(extraEnv []string, args ...string) (*Process, error) {
 	}
 	p.cmd.Env = append(os.Environ(), extraEnv...)
 	tellCommandNotToSpawnShell(p.cmd)          // windows specific
-	tellCommandToStartOnNewProcessGroup(p.cmd) // linux specific
+	tellCommandToStartOnNewProcessGroup(p.cmd) // linux and macosx specific
 
 	// This is required because some tools detects if the program is running
 	// from terminal by looking at the stdin/out bindings.
@@ -67,6 +67,8 @@ func NewProcess(extraEnv []string, args ...string) (*Process, error) {
 
 // TellCommandNotToSpawnShell avoids that the specified Cmd display a small
 // command prompt while runnning on Windows. It has no effects on other OS.
+//
+// Deprecated: TellCommandNotToSpawnShell is now always applied by default, there is no need to call it anymore.
 func (p *Process) TellCommandNotToSpawnShell() {
 	tellCommandNotToSpawnShell(p.cmd)
 }
