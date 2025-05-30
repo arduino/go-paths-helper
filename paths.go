@@ -561,5 +561,8 @@ func (p *Path) Canonical() *Path {
 	if absPath, err := canonical.Abs(); err == nil {
 		canonical = absPath
 	}
+	if c, err := canonicalize(canonical.path); c != "" && err == nil {
+		canonical.path = c
+	}
 	return canonical
 }
