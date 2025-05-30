@@ -339,7 +339,7 @@ func TestEquivalentPaths(t *testing.T) {
 
 	if runtime.GOOS == "windows" {
 		q := New("testdata", "fileset", "anotherFile")
-		r := New("testdata", "fileset", "ANOTHE~1")
+		r := New(shorten(t, q.String()))
 		require.True(t, q.EquivalentTo(r))
 		require.True(t, r.EquivalentTo(q))
 	}
