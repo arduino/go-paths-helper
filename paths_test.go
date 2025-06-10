@@ -339,7 +339,8 @@ func TestEquivalentPaths(t *testing.T) {
 
 	if runtime.GOOS == "windows" {
 		q := New("testdata", "fileset", "anotherFile")
-		r := New("testdata", "fileset", "ANOTHE~1")
+		r := New(shorten(t, q.String()))
+		t.Log("SHORTENED PATH:", r.String())
 		require.True(t, q.EquivalentTo(r))
 		require.True(t, r.EquivalentTo(q))
 	}
@@ -356,7 +357,9 @@ func TestCanonicalize(t *testing.T) {
 	require.Equal(t, wd.Join("testdata", "fileset", "nonexistentFile").String(), p.String())
 
 	if runtime.GOOS == "windows" {
-		q := New("testdata", "fileset", "ANOTHE~1").Canonical()
+		qshort := New(shorten(t, New("testdata", "fileset", "anotherFile").String()))
+		t.Log("SHORTENED PATH:", qshort.String())
+		q := qshort.Canonical()
 		require.Equal(t, wd.Join("testdata", "fileset", "anotherFile").String(), q.String())
 
 		r := New("c:\\").Canonical()
