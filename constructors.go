@@ -30,7 +30,6 @@
 package paths
 
 import (
-	"io/ioutil"
 	"os"
 	"runtime"
 )
@@ -53,7 +52,7 @@ func TempDir() *Path {
 // the new directory. If dir is the empty string, TempDir uses the
 // default directory for temporary files
 func MkTempDir(dir, prefix string) (*Path, error) {
-	path, err := ioutil.TempDir(dir, prefix)
+	path, err := os.MkdirTemp(dir, prefix)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +69,7 @@ func MkTempFile(dir *Path, prefix string) (*os.File, error) {
 	if dir != nil {
 		tmpDir = dir.String()
 	}
-	return ioutil.TempFile(tmpDir, prefix)
+	return os.CreateTemp(tmpDir, prefix)
 }
 
 // Getwd returns a rooted path name corresponding to the current
