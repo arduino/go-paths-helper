@@ -21,17 +21,8 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-//go:build !windows
-
+// Paths is a library that provides a set of utilities to work with file paths in a platform-independent way.
+// It includes functions for creating temporary directories and files, handling null paths, and more.
+// It is designed to be used in Go applications that require file system operations without worrying about
+// platform-specific details.
 package paths
-
-import (
-	"testing"
-
-	"github.com/stretchr/testify/require"
-)
-
-func shorten(t *testing.T, longPath string) string {
-	require.FailNow(t, "shorten is not implemented for this platform")
-	return ""
-}
