@@ -82,10 +82,10 @@ func (p *Process) RedirectStdoutTo(out io.Writer) {
 	p.cmd.Stdout = out
 }
 
-// RedirectStderrTo will redirect the process' stdout to the specified
+// RedirectStderrTo will redirect the process' stderr to the specified
 // writer. Any previous redirection will be overwritten.
-func (p *Process) RedirectStderrTo(out io.Writer) {
-	p.cmd.Stderr = out
+func (p *Process) RedirectStderrTo(err io.Writer) {
+	p.cmd.Stderr = err
 }
 
 // StdinPipe returns a pipe that will be connected to the command's standard
