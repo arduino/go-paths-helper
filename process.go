@@ -214,6 +214,17 @@ func (p *Process) RunAndCaptureOutput(ctx context.Context) ([]byte, []byte, erro
 	return stdout.Bytes(), stderr.Bytes(), err
 }
 
+// RunAndCaptureCombinedOutput starts the specified command and waits for it to complete. If the given context
+// is canceled before the normal process termination, the process is killed. The standard output and
+// standard error of the process are captured and returned combined at process termination.
+func (p *Process) RunAndCaptureCombinedOutput(ctx context.Context) ([]byte, error) {
+	out := &bytes.Buffer{}
+	p.RedirectStdoutTo(out)
+	p.RedirectStderrTo(out)
+	err := p.RunWithinContext(ctx)
+	return out.Bytes(), err
+}
+
 // GetArgs returns the command arguments
 func (p *Process) GetArgs() []string {
 	return p.cmd.Args
