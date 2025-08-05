@@ -57,6 +57,20 @@ func (p *PathList) AsStrings() []string {
 	return res
 }
 
+// Equals returns true if the current PathList is equal to the
+// PathList passed as argument
+func (p *PathList) Equals(other PathList) bool {
+	if len(*p) != len(other) {
+		return false
+	}
+	for i, path := range *p {
+		if !path.EqualsTo(other[i]) {
+			return false
+		}
+	}
+	return true
+}
+
 // FilterDirs remove all entries except directories
 func (p *PathList) FilterDirs() {
 	res := (*p)[:0]
